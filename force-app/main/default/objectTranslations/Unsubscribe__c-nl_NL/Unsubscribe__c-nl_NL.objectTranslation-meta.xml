@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObjectTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <validationRules>
+        <errorMessage>De Public Id moet bestaan uit C of L gevolgd door een Public Id, of uit de record-Id van een contact of lead.</errorMessage>
+        <name>Public_Id_Format</name>
+    </validationRules>
+    <validationRules>
+        <errorMessage>Vul een Public Id of een Unsubscribe Email in.</errorMessage>
+        <name>Public_Id_Or_Email_Required</name>
+    </validationRules>
+</CustomObjectTranslation>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <help>De linkwaarde waarmee dit verzoek is aangemaakt: C of L gevolgd door de Public Id van het contact of de lead. Leeg als de ontvanger een e-mailadres heeft ingetypt.</help>
+    <name>Public_Id__c</name>
+</CustomFieldTranslation>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <help>Hoe vaak, in uren, afmeldverzoeken worden verwerkt. Voer na een wijziging de installatieflow uit, zodat het nieuwe interval ingaat.</help>
+    <name>Batch_Interval_Hours__c</name>
+</CustomFieldTranslation>

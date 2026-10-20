@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObjectTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <validationRules>
+        <errorMessage>Retention Days en Max Retry Attempts moeten minimaal 1 zijn.</errorMessage>
+        <name>Retention_And_Retries_At_Least_One</name>
+    </validationRules>
+</CustomObjectTranslation>

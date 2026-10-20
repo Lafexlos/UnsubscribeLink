@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <help>Vink dit alleen aan als je e-mails hebt verstuurd met de oude, onbeheerde Unsubscribe Link-app. Die links bevatten de record-Id, en die is veel makkelijker te raden dan een Public Id. Iemand kan dan anderen afmelden door record-Id's uit te proberen.</help>
+    <name>Accept_Legacy_Record_Id_Links__c</name>
+</CustomFieldTranslation>

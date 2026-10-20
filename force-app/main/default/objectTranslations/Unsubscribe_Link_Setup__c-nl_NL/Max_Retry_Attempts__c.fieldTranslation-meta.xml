@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <help>Hoe vaak een mislukt afmeldverzoek wordt geprobeerd voordat de batch het opgeeft en het meldt.</help>
+    <name>Max_Retry_Attempts__c</name>
+</CustomFieldTranslation>
