@@ -19,7 +19,7 @@ Smaller, independent items are listed first.
 
   Close the section with "helps with compliance, does not guarantee it".
 - [ ] **Test whether the Flow Send Email action honors Email Opt Out.** Run it in a scratch org and fill in that row of the README table.
-- [ ] **Assign Public Ids in an Apex before-insert trigger.** It replaces the Draft after-save flows `Contact_After_Create_Update_Set_Public_Id` and `Lead_After_Create_Update_Set_Public_Id`. Add a bypass switch for large imports. The existing backfill batch stays for records created before the trigger. Doing this drops the agenda item "friendly way to turn record-triggered flows on/off".
+- [x] **Assign Public Ids in an Apex before-insert trigger.** It replaces the Draft after-save flows `Contact_After_Create_Update_Set_Public_Id` and `Lead_After_Create_Update_Set_Public_Id`. Add a bypass switch for large imports. The existing backfill batch stays for records created before the trigger. Doing this drops the agenda item "friendly way to turn record-triggered flows on/off".
 - [ ] **Add a setup check to the setup flow.** It reports pass or fail for each of these:
   - The site exists and is published.
   - The org-wide email address is verified.
@@ -39,6 +39,7 @@ Smaller, independent items are listed first.
 
 ## Next sprint or known issues
 
+- **Retire the Set Public Id flows in subscriber orgs.** Orgs that activated `Contact_After_Create_Update_Set_Public_Id` or `Lead_After_Create_Update_Set_Public_Id` must deactivate them after upgrading, because they ignore the import bypass. The setup flow's screen text that mentions these flows is out of date.
 - **Build the link from the Public Id instead of storing it.** Compute the URL in a formula from the Public Id plus the site URL kept in custom metadata. This removes the `+` split hack and the domain string replacement. It means migrating off `Part1_Unsubscribe_Link__c`. Links already sent are unaffected ([ADR 0001](adr/0001-unsubscribe-links-never-expire.md)).
 - **Keep links working after a merge.** Copy the losing record's Public Id onto the record that survives. Until then, those links end as Not Found Requests.
 - **Confirm type-in Requests by email.** A type-in Request stays Pending until someone clicks a link sent to the typed address.

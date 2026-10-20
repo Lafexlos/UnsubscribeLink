@@ -8,8 +8,13 @@
  * still gets its Public Id and the link is left as it is. The setup flow's
  * backfill batch fills the link later. This handler never blocks a save.
  *
- * Admins can turn it off for large imports with the hierarchy custom setting
- * Unsubscribe_Link_Settings__c.Disable_Public_Id_Assignment__c.
+ * An update that clears the Public Id gets the old value back, and the old link
+ * if the link was cleared too. Links never expire (ADR 0001), so a record never
+ * gets a second Public Id.
+ *
+ * Admins can turn off new Public Ids for large imports with the hierarchy custom
+ * setting Unsubscribe_Link_Settings__c.Disable_Public_Id_Assignment__c. Restoring
+ * a cleared Public Id still happens while the setting is on.
  *
  * Runs without sharing because it only reads the org-wide setup record and the
  * site domain, which every user creating Contacts or Leads needs.
@@ -24,8 +29,16 @@ public without sharing class PublicIdTriggerHandler {
   // Loaded once per transaction, so the trigger runs at most two queries
   private static LinkSettings linkSettings;
 
-  public static void assignPublicIds(List<SObject> records) {
-    if (records == null || records.isEmpty() || isAssignmentDisabled()) {
+  // oldRecords is Trigger.oldMap, which is null on insert
+  public static void assignPublicIds(
+    List<SObject> records,
+    Map<Id, SObject> oldRecords
+  ) {
+    if (records == null || records.isEmpty()) {
+      return;
+    }
+    restoreClearedPublicIds(records, oldRecords);
+    if (isAssignmentDisabled()) {
       return;
     }
 
@@ -43,6 +56,32 @@ public without sharing class PublicIdTriggerHandler {
 
     UUIDUtility.generateUUIDsForRecords(recordsWithoutPublicId, PUBLIC_ID_FIELD);
     setUnsubscribeLinks(recordsWithoutPublicId);
+  }
+
+  private static void restoreClearedPublicIds(
+    List<SObject> records,
+    Map<Id, SObject> oldRecords
+  ) {
+    if (oldRecords == null || oldRecords.isEmpty()) {
+      return;
+    }
+    SObjectField linkField = LINK_FIELDS.get(records[0].getSObjectType());
+    for (SObject record : records) {
+      SObject oldRecord = oldRecords.get(record.Id);
+      if (oldRecord == null) {
+        continue;
+      }
+      String oldPublicId = (String) oldRecord.get(PUBLIC_ID_FIELD);
+      if (
+        String.isBlank((String) record.get(PUBLIC_ID_FIELD)) &&
+        String.isNotBlank(oldPublicId)
+      ) {
+        record.put(PUBLIC_ID_FIELD, oldPublicId);
+        if (linkField != null && String.isBlank((String) record.get(linkField))) {
+          record.put(linkField, oldRecord.get(linkField));
+        }
+      }
+    }
   }
 
   private static void setUnsubscribeLinks(List<SObject> records) {

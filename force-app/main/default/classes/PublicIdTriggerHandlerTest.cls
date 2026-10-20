@@ -163,7 +163,7 @@ private class PublicIdTriggerHandlerTest {
   }
 
   @IsTest
-  static void testUpdateSetsPublicIdWhenBlank() {
+  static void testUpdateSetsPublicIdWhenRecordNeverHadOne() {
     // Arrange
     setAssignmentDisabled(true);
     Lead lead = buildLeads(1)[0];
@@ -209,6 +209,72 @@ private class PublicIdTriggerHandlerTest {
       saved.Part1_Unsubscribe_Link__c,
       'Update must not change the link'
     );
+  }
+
+  @IsTest
+  static void testUpdateClearingPublicIdRestoresIdAndLink() {
+    // Arrange
+    PublicIdTriggerHandler.useLinkSettings(SITE_DOMAIN, LINK_TEXT);
+    Contact contact = buildContacts(1)[0];
+    insert contact;
+    Contact inserted = [SELECT Public_Id__c, Part1_Unsubscribe_Link__c FROM Contact WHERE Id = :contact.Id];
+
+    // Act
+    Test.startTest();
+    update new Contact(Id = contact.Id, Public_Id__c = null, Part1_Unsubscribe_Link__c = null);
+    Test.stopTest();
+
+    // Assert
+    Contact saved = [SELECT Public_Id__c, Part1_Unsubscribe_Link__c FROM Contact WHERE Id = :contact.Id];
+    Assert.areEqual(inserted.Public_Id__c, saved.Public_Id__c, 'A cleared Public Id should get its old value back');
+    Assert.areEqual(
+      inserted.Part1_Unsubscribe_Link__c,
+      saved.Part1_Unsubscribe_Link__c,
+      'A cleared link should get its old value back'
+    );
+  }
+
+  @IsTest
+  static void testUpdateClearingPublicIdWithBypassOnRestoresIdAndLink() {
+    // Arrange
+    PublicIdTriggerHandler.useLinkSettings(SITE_DOMAIN, LINK_TEXT);
+    Lead lead = buildLeads(1)[0];
+    insert lead;
+    Lead inserted = [SELECT Public_Id__c, Part1_Unsubscribe_Link__c FROM Lead WHERE Id = :lead.Id];
+    setAssignmentDisabled(true);
+
+    // Act
+    Test.startTest();
+    update new Lead(Id = lead.Id, Public_Id__c = null, Part1_Unsubscribe_Link__c = null);
+    Test.stopTest();
+
+    // Assert
+    Lead saved = [SELECT Public_Id__c, Part1_Unsubscribe_Link__c FROM Lead WHERE Id = :lead.Id];
+    Assert.areEqual(inserted.Public_Id__c, saved.Public_Id__c, 'Bypass must not stop a cleared Public Id from being restored');
+    Assert.areEqual(
+      inserted.Part1_Unsubscribe_Link__c,
+      saved.Part1_Unsubscribe_Link__c,
+      'Bypass must not stop a cleared link from being restored'
+    );
+  }
+
+  @IsTest
+  static void testUpdateClearingOnlyPublicIdKeepsNewLink() {
+    // Arrange
+    PublicIdTriggerHandler.useLinkSettings(SITE_DOMAIN, LINK_TEXT);
+    Contact contact = buildContacts(1)[0];
+    insert contact;
+    Contact inserted = [SELECT Public_Id__c FROM Contact WHERE Id = :contact.Id];
+
+    // Act
+    Test.startTest();
+    update new Contact(Id = contact.Id, Public_Id__c = null, Part1_Unsubscribe_Link__c = EXISTING_LINK);
+    Test.stopTest();
+
+    // Assert
+    Contact saved = [SELECT Public_Id__c, Part1_Unsubscribe_Link__c FROM Contact WHERE Id = :contact.Id];
+    Assert.areEqual(inserted.Public_Id__c, saved.Public_Id__c, 'A cleared Public Id should get its old value back');
+    Assert.areEqual(EXISTING_LINK, saved.Part1_Unsubscribe_Link__c, 'A link set in the same update should be kept');
   }
 
   @IsTest
