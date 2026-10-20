@@ -493,6 +493,14 @@
             <stringValue>Yes</stringValue>
         </value>
     </choices>
+    <constants>
+        <description>Name of the Site that hosts the unsubscribe page. Matches SITE_NAME in UUIDBatchJob, which builds the links.</description>
+        <name>UnsubscribeSiteName</name>
+        <dataType>String</dataType>
+        <value>
+            <stringValue>Unsubscribe</stringValue>
+        </value>
+    </constants>
     <customProperties>
         <name>ScreenProgressIndicator</name>
         <value>
@@ -792,6 +800,14 @@ Added path Progress Indicator.</description>
         <connector>
             <targetReference>Get_My_Domain</targetReference>
         </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Name</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>UnsubscribeSiteName</elementReference>
+            </value>
+        </filters>
         <getFirstRecordOnly>true</getFirstRecordOnly>
         <object>Site</object>
         <storeOutputAutomatically>true</storeOutputAutomatically>
