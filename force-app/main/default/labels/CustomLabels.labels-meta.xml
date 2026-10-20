@@ -112,4 +112,76 @@
         <shortDescription>Warning shown when the Admin turns on type-in mode</shortDescription>
         <value>Warning: With this on, anyone, including a script, can type in any list of email addresses and unsubscribe them. Nothing checks that the person typing owns the address.</value>
     </labels>
+    <labels>
+        <fullName>Confirmation_Email_Subject</fullName>
+        <categories>Batch</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Subject of the Confirmation Email</shortDescription>
+        <value>Unsubscribe Confirmation</value>
+    </labels>
+    <labels>
+        <fullName>Request_Digest_Subject</fullName>
+        <categories>Batch</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Subject of the Unsubscribe Request digest</shortDescription>
+        <value>Unsubscribe Link: Unsubscribe Requests need your attention</value>
+    </labels>
+    <labels>
+        <fullName>Request_Digest_Intro</fullName>
+        <categories>Batch</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>First line of the Unsubscribe Request digest</shortDescription>
+        <value>The Unsubscribe Link batch processed Unsubscribe Requests. Some of them need your attention.</value>
+    </labels>
+    <labels>
+        <fullName>Request_Digest_Unsubscribed</fullName>
+        <categories>Batch</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Digest line, {0} is a number</shortDescription>
+        <value>Unsubscribed: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Request_Digest_Retrying</fullName>
+        <categories>Batch</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Digest line, {0} is a number</shortDescription>
+        <value>Error, tried again in the next run: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Request_Digest_Gave_Up</fullName>
+        <categories>Batch</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Digest line, {0} is a number</shortDescription>
+        <value>Error, no retries left: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Request_Digest_Not_Found</fullName>
+        <categories>Batch</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Digest line, {0} is a number</shortDescription>
+        <value>Not Found, no Contact or Lead matches: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Request_Digest_Email_Failures</fullName>
+        <categories>Batch</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Digest line, {0} is a number</shortDescription>
+        <value>Confirmation emails that could not be sent: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Request_Digest_Next_Steps</fullName>
+        <categories>Batch</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Last part of the Unsubscribe Request digest</shortDescription>
+        <value>Open the Needs attention list view on the Unsubscribe tab to see these Unsubscribe Requests. Requests with no retries left and Not Found Requests are not processed again, so set Email Opt Out by hand where needed.</value>
+    </labels>
 </CustomLabels>

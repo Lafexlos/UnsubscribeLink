@@ -56,4 +56,40 @@
         <label>Let op: als dit aanstaat, kan iedereen, ook een script, een willekeurige lijst e-mailadressen invoeren en die afmelden. Er wordt niet gecontroleerd of degene die typt eigenaar is van het adres.</label>
         <name>Type_In_Mode_Warning</name>
     </customLabels>
+    <customLabels>
+        <label>Bevestiging van je afmelding</label>
+        <name>Confirmation_Email_Subject</name>
+    </customLabels>
+    <customLabels>
+        <label>Unsubscribe Link: afmeldverzoeken hebben je aandacht nodig</label>
+        <name>Request_Digest_Subject</name>
+    </customLabels>
+    <customLabels>
+        <label>De Unsubscribe Link-batch heeft afmeldverzoeken verwerkt. Een deel daarvan heeft je aandacht nodig.</label>
+        <name>Request_Digest_Intro</name>
+    </customLabels>
+    <customLabels>
+        <label>Afgemeld: {0}</label>
+        <name>Request_Digest_Unsubscribed</name>
+    </customLabels>
+    <customLabels>
+        <label>Fout, wordt bij de volgende run opnieuw geprobeerd: {0}</label>
+        <name>Request_Digest_Retrying</name>
+    </customLabels>
+    <customLabels>
+        <label>Fout, geen nieuwe pogingen meer: {0}</label>
+        <name>Request_Digest_Gave_Up</name>
+    </customLabels>
+    <customLabels>
+        <label>Niet gevonden, geen contact of lead komt overeen: {0}</label>
+        <name>Request_Digest_Not_Found</name>
+    </customLabels>
+    <customLabels>
+        <label>Bevestigingsmails die niet verstuurd konden worden: {0}</label>
+        <name>Request_Digest_Email_Failures</name>
+    </customLabels>
+    <customLabels>
+        <label>Open de lijstweergave Needs attention op het tabblad Unsubscribe om deze afmeldverzoeken te bekijken. Verzoeken zonder nieuwe pogingen en niet gevonden verzoeken worden niet opnieuw verwerkt, dus zet Email Opt Out waar nodig zelf aan.</label>
+        <name>Request_Digest_Next_Steps</name>
+    </customLabels>
 </Translations>
