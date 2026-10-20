@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Attempt_Count__c</fullName>
+    <defaultValue>0</defaultValue>
+    <description>Number of times the batch failed to process this Request. The batch retries an Error Request until this reaches Max Retry Attempts on the Unsubscribe Link Setup record.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Number of failed processing attempts.</inlineHelpText>
+    <label>Attempt Count</label>
+    <precision>3</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

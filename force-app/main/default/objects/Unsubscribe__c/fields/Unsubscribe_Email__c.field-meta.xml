@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Unsubscribe_Email__c</fullName>
-    <description>The email to unsubscribe</description>
+    <description>The email address to unsubscribe. A type-in Request sets it when it is created. For a Request from a link, the batch fills it from the Contact or Lead.</description>
     <externalId>false</externalId>
     <inlineHelpText>The email to unsubscribe</inlineHelpText>
     <label>Unsubscribe Email</label>
-    <required>true</required>
+    <required>false</required>
     <trackTrending>false</trackTrending>
     <type>Email</type>
     <unique>false</unique>

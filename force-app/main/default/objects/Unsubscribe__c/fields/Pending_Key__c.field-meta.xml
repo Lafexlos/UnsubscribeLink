@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Pending_Key__c</fullName>
+    <caseSensitive>true</caseSensitive>
+    <description>Unique key that allows one open Request per link. Holds the Public Id, or E: plus the lower-case email address for a type-in Request. The batch clears it when the Request is processed or gives up retrying, so a new click can create a new Request. Case sensitive because 15-character record Ids in legacy links differ only by case.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Set while the Request waits to be processed. Cleared when the Request is done.</inlineHelpText>
+    <label>Pending Key</label>
+    <length>255</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>true</unique>
+</CustomField>

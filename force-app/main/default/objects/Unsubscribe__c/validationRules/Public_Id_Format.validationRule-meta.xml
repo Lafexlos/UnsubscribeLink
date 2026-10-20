@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Public_Id_Format</fullName>
+    <active>true</active>
+    <description>Public Id must be C or L plus a UUID v4, or a Contact or Lead Id from a legacy link (ADR 0002). Checked only on insert or change. The legacy-link setting is enforced by the existence check and the batch.</description>
+    <errorConditionFormula>AND(
+  NOT(ISBLANK(Public_Id__c)),
+  OR(ISNEW(), ISCHANGED(Public_Id__c)),
+  NOT(REGEX(Public_Id__c, &quot;[CL][0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}&quot;)),
+  NOT(REGEX(Public_Id__c, &quot;(003|00Q)[a-zA-Z0-9]{12}([a-zA-Z0-9]{3})?&quot;))
+)</errorConditionFormula>
+    <errorDisplayField>Public_Id__c</errorDisplayField>
+    <errorMessage>Public Id must be C or L followed by a Public Id, or a Contact or Lead record Id.</errorMessage>
+</ValidationRule>

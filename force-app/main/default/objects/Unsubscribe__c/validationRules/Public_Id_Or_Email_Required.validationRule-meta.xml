@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Public_Id_Or_Email_Required</fullName>
+    <active>true</active>
+    <description>A Request needs a Public Id from a link or a typed-in email address, otherwise the batch can&apos;t tell who to unsubscribe.</description>
+    <errorConditionFormula>AND(
+  ISBLANK(Public_Id__c),
+  ISBLANK(Unsubscribe_Email__c)
+)</errorConditionFormula>
+    <errorMessage>Enter a Public Id or an Unsubscribe Email.</errorMessage>
+</ValidationRule>

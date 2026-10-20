@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Public_Id__c</fullName>
+    <description>The varRecId value from the Unsubscribe Link that created this Request: C or L followed by the Contact or Lead Public Id. Legacy links from the unmanaged app carry a Contact or Lead record Id instead. Blank for Requests typed in by email address.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>The link value that created this Request. C or L followed by the Public Id of the Contact or Lead. Blank when the Recipient typed in an email address.</inlineHelpText>
+    <label>Public Id</label>
+    <length>37</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

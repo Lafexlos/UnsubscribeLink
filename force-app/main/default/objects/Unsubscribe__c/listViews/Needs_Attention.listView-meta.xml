@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Needs_Attention</fullName>
+    <columns>NAME</columns>
+    <columns>CREATED_DATE</columns>
+    <columns>Status__c</columns>
+    <columns>Unsubscribe_Email__c</columns>
+    <columns>Public_Id__c</columns>
+    <columns>Attempt_Count__c</columns>
+    <columns>Error_Message__c</columns>
+    <columns>Contact__c</columns>
+    <columns>Lead__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>Status__c</field>
+        <operation>equals</operation>
+        <value>Error,Not Found</value>
+    </filters>
+    <label>Needs attention</label>
+</ListView>

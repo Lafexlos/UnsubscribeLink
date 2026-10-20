@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Max_Retry_Attempts__c</fullName>
+    <defaultValue>5</defaultValue>
+    <description>Number of times the batch tries an Unsubscribe Request that fails before it gives up. After the last attempt the Request stays Error and its Pending Key is cleared.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>How many times a failed Unsubscribe Request is tried before the batch gives up and reports it.</inlineHelpText>
+    <label>Max Retry Attempts</label>
+    <precision>3</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

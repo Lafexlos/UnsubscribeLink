@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Accept_Legacy_Record_Id_Links__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>When checked, Unsubscribe Links from the unmanaged predecessor app, which carry a Contact or Lead record Id instead of a Public Id, still work (ADR 0001). Off by default because record Ids are much easier to guess than Public Ids.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Check this only if you sent emails with the old unmanaged Unsubscribe Link app. Those links contain the record Id, which is much easier to guess than a Public Id, so anyone could unsubscribe other people by trying record Ids.</inlineHelpText>
+    <label>Accept Legacy Record Id Links</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>
