@@ -2,6 +2,8 @@
 private class UUIDBatchInvocableTest {
   @TestSetup
   static void setupTestData() {
+    // The batch backfills records the Public Id triggers skipped
+    TestDataFactory.disablePublicIdAssignment();
     List<Contact> contacts = new List<Contact>();
 
     for (Integer i = 0; i < 500; i++) {

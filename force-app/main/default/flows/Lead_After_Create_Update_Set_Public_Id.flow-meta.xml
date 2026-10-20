@@ -25,7 +25,7 @@
         <versionSegment>1</versionSegment>
     </actionCalls>
     <apiVersion>61.0</apiVersion>
-    <description>This version looks up the friendly name/Link text and appends it to the unsubscribe link that is set on the lead.</description>
+    <description>This version looks up the friendly name/Link text and appends it to the unsubscribe link that is set on the lead. Replaced by the Apex trigger LeadPublicIdTrigger. Keep this flow inactive, or it ignores the Disable Public Id Assignment bypass setting.</description>
     <environments>Default</environments>
     <interviewLabel>Lead || After Create/Update || Set Public Id {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Lead || After Create/Update || Set Public Id</label>

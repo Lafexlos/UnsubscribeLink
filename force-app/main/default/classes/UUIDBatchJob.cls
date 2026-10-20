@@ -3,7 +3,6 @@ public with sharing class UUIDBatchJob implements Database.Batchable<SObject> {
   private String fieldName;
   private String unsubscribeLinkField;
   private String siteBaseUrl;
-  private static final String SITE_NAME = 'Unsubscribe';
   private String objectTypeLetter;
   private String linkText;
 
@@ -20,7 +19,7 @@ public with sharing class UUIDBatchJob implements Database.Batchable<SObject> {
       String baseURL = partnerURL.substring(0, servicesIndex + 1);
       this.siteBaseUrl = baseURL.replace(
         'salesforce.com/',
-        'site.com/' + SITE_NAME + '/s/'
+        'site.com/' + UnsubscribeLinkBuilder.SITE_NAME + '/s/'
       );
     } else {
       throw new UUIDBatchException('Unable to determine site URL');
@@ -29,17 +28,18 @@ public with sharing class UUIDBatchJob implements Database.Batchable<SObject> {
     // Determine the unsubscribe link field based on object type
     if (objectType.equalsIgnoreCase('Contact')) {
       this.unsubscribeLinkField = 'Part1_Unsubscribe_Link__c'; // Adjust field name as needed
-      this.objectTypeLetter = 'C';
+      this.objectTypeLetter = UnsubscribeLinkBuilder.CONTACT_LETTER;
     } else if (objectType.equalsIgnoreCase('Lead')) {
       this.unsubscribeLinkField = 'Part1_Unsubscribe_Link__c';
-      this.objectTypeLetter = 'L';
+      this.objectTypeLetter = UnsubscribeLinkBuilder.LEAD_LETTER;
     } else {
       throw new UUIDBatchException('Object type must be Contact or Lead');
     }
   }
 
   public Database.QueryLocator start(Database.BatchableContext bc) {
-    // Get records with null UUID field, include UnsubscribeLink field
+    // Get records with a null UUID field or no unsubscribe link. Records saved
+    // before setup ran get a Public Id from the trigger but no link.
     String query =
       'SELECT Id, ' +
       fieldName +
@@ -49,6 +49,8 @@ public with sharing class UUIDBatchJob implements Database.Batchable<SObject> {
       objectType +
       ' WHERE ' +
       fieldName +
+      ' = null OR ' +
+      unsubscribeLinkField +
       ' = null';
     return Database.getQueryLocator(query);
   }
@@ -125,12 +127,12 @@ public with sharing class UUIDBatchJob implements Database.Batchable<SObject> {
   }
 
   private String generateUnsubscribeLink(String uuid) {
-    return siteBaseUrl +
-      'unsubscribe?varRecId=' +
-      objectTypeLetter +
-      uuid +
-      '+' +
-      linkText;
+    return UnsubscribeLinkBuilder.buildLink(
+      siteBaseUrl,
+      objectTypeLetter,
+      uuid,
+      linkText
+    );
   }
 
   public class UUIDBatchException extends Exception {

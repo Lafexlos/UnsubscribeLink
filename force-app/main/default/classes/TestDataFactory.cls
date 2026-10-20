@@ -131,6 +131,14 @@ public with sharing class TestDataFactory {
     insert as user leads;
   }
     
+  // Stops the Public Id triggers, so tests can create records without Public Ids
+  public static void disablePublicIdAssignment() {
+    insert new Unsubscribe_Link_Settings__c(
+      SetupOwnerId = UserInfo.getOrganizationId(),
+      Disable_Public_Id_Assignment__c = true
+    );
+  }
+
   public static void createULSetup(){
       Unsubscribe_Link_Setup__c  ulSetup = new Unsubscribe_Link_Setup__c();
       ulSetup.Link_Text__c = 'Click here to unsubscribe' ;
