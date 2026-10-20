@@ -255,4 +255,51 @@ private class UUIDBatchJobTest {
       'The batch should build the link from the existing Public Id'
     );
   }
+  @isTest
+  static void testBatchSkipsConvertedLeads() {
+    // Arrange: convert one of the setup Leads, which has no Public Id
+    Lead convertedLead = [SELECT Id FROM Lead LIMIT 1];
+    LeadStatus convertedStatus = [
+      SELECT ApiName
+      FROM LeadStatus
+      WHERE IsConverted = TRUE
+      LIMIT 1
+    ];
+    Database.LeadConvert leadConvert = new Database.LeadConvert();
+    leadConvert.setLeadId(convertedLead.Id);
+    leadConvert.setConvertedStatus(convertedStatus.ApiName);
+    leadConvert.setDoNotCreateOpportunity(true);
+    Database.LeadConvertResult convertResult = Database.convertLead(leadConvert);
+    Assert.isTrue(convertResult.isSuccess(), 'Test Lead should convert');
+    UUIDBatchJob batchJob = new UUIDBatchJob(
+      'Lead',
+      'Public_Id__c',
+      'Unsubscribe all'
+    );
+
+    // Act
+    Test.startTest();
+    Database.executeBatch(batchJob, 200);
+    Test.stopTest();
+
+    // Assert
+    List<Lead> unstampedLeads = [
+      SELECT Id
+      FROM Lead
+      WHERE IsConverted = FALSE AND Public_Id__c = NULL
+    ];
+    Lead savedConvertedLead = [
+      SELECT Public_Id__c
+      FROM Lead
+      WHERE Id = :convertedLead.Id
+    ];
+    Assert.isTrue(
+      unstampedLeads.isEmpty(),
+      'Unconverted Leads in the same chunk should get Public Ids'
+    );
+    Assert.isNull(
+      savedConvertedLead.Public_Id__c,
+      'The batch should leave converted Leads alone'
+    );
+  }
 }

@@ -47,11 +47,15 @@ public with sharing class UUIDBatchJob implements Database.Batchable<SObject> {
       unsubscribeLinkField +
       ' FROM ' +
       objectType +
-      ' WHERE ' +
+      ' WHERE (' +
       fieldName +
       ' = null OR ' +
       unsubscribeLinkField +
-      ' = null';
+      ' = null)';
+    // Converted Leads can't be updated, and one would fail the whole chunk
+    if (objectType.equalsIgnoreCase('Lead')) {
+      query += ' AND IsConverted = false';
+    }
     return Database.getQueryLocator(query);
   }
 
