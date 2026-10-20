@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Setup_Check_Title</fullName>
+        <categories>Setup</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup check screen title</shortDescription>
+        <value>Setup check</value>
+    </labels>
+    <labels>
+        <fullName>Setup_Check_Intro</fullName>
+        <categories>Setup</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup check screen intro</shortDescription>
+        <value>These checks show whether the Unsubscribe Link is ready to use.</value>
+    </labels>
+    <labels>
+        <fullName>Setup_Check_Site_Pass</fullName>
+        <categories>Setup</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup check site pass</shortDescription>
+        <value>Pass: The Experience site exists and is active.</value>
+    </labels>
+    <labels>
+        <fullName>Setup_Check_Site_Fail</fullName>
+        <categories>Setup</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup check site fail</shortDescription>
+        <value>Fail: The Experience site is missing or not active.</value>
+    </labels>
+    <labels>
+        <fullName>Setup_Check_Site_Hint</fullName>
+        <categories>Setup</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup check site fix hint</shortDescription>
+        <value>In Setup, go to Digital Experiences, All Sites. If there is no Unsubscribe site, create it as the Set Up Instructions describe. If its status is not Active, open Workspaces, Administration, Settings and click Activate. Then publish the site in Experience Builder.</value>
+    </labels>
+    <labels>
+        <fullName>Setup_Check_Email_Pass</fullName>
+        <categories>Setup</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup check org-wide email pass</shortDescription>
+        <value>Pass: The org-wide email address for confirmation emails is verified.</value>
+    </labels>
+    <labels>
+        <fullName>Setup_Check_Email_Fail</fullName>
+        <categories>Setup</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup check org-wide email fail</shortDescription>
+        <value>Fail: The org-wide email address for confirmation emails is missing or not verified.</value>
+    </labels>
+    <labels>
+        <fullName>Setup_Check_Email_Hint</fullName>
+        <categories>Setup</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup check org-wide email fix hint</shortDescription>
+        <value>In Setup, go to Organization-Wide Addresses. Add the address if it is missing. If it is not verified, click the link in the email Salesforce sent to that address, or send it again from that page. Confirmation emails do not go out until the address is verified.</value>
+    </labels>
+    <labels>
+        <fullName>Setup_Check_Public_Id_Pass</fullName>
+        <categories>Setup</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup check Public Id pass</shortDescription>
+        <value>Pass: Every Contact and Lead with an email address has a Public Id.</value>
+    </labels>
+    <labels>
+        <fullName>Setup_Check_Public_Id_Fail</fullName>
+        <categories>Setup</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup check Public Id fail</shortDescription>
+        <value>Fail: Some Contacts or Leads with an email address have no Public Id.</value>
+    </labels>
+    <labels>
+        <fullName>Setup_Check_Contacts_Missing</fullName>
+        <categories>Setup</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup check count of Contacts without Public Id</shortDescription>
+        <value>Contacts without a Public Id</value>
+    </labels>
+    <labels>
+        <fullName>Setup_Check_Leads_Missing</fullName>
+        <categories>Setup</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup check count of Leads without Public Id</shortDescription>
+        <value>Leads without a Public Id</value>
+    </labels>
+    <labels>
+        <fullName>Setup_Check_Public_Id_Hint</fullName>
+        <categories>Setup</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup check Public Id fix hint</shortDescription>
+        <value>This setup just started the job that adds the missing Public Ids, so this check fails the first time. You get an email when the job is done. Run this setup again after that to check.</value>
+    </labels>
+    <labels>
+        <fullName>Type_In_Mode_Warning</fullName>
+        <categories>Setup</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Warning shown when the Admin turns on type-in mode</shortDescription>
+        <value>Warning: With this on, anyone, including a script, can type in any list of email addresses and unsubscribe them. Nothing checks that the person typing owns the address.</value>
+    </labels>
+</CustomLabels>
