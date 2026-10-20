@@ -302,7 +302,7 @@ private class SetupCheckInvocableTest {
     for (CronTrigger job : [SELECT Id FROM CronTrigger WHERE CronJobDetail.Name = :ScheduleRequestBatchInvocable.JOB_NAME]) {
       System.abortJob(job.Id);
     }
-    System.schedule(ScheduleRequestBatchInvocable.JOB_NAME, '0 0 0/1 * * ?', new UnsubscribeRequestBatch());
+    System.schedule(ScheduleRequestBatchInvocable.JOB_NAME, '0 0 0/1 * * ?', new UnsubscribeRequestScheduler());
 
     Test.startTest();
     SetupCheckInvocable.SetupCheckResult result = runSingle(null, null);

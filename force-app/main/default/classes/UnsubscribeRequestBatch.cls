@@ -1,6 +1,8 @@
 /**
  * Processes the Unsubscribe Requests that the guest flow records (ADR 0002).
- * Scheduled by the setup flow, so it runs as the Admin who ran that flow.
+ * The setup flow schedules UnsubscribeRequestScheduler, which calls this class's
+ * execute(SchedulableContext) by name, so it runs as the Admin who ran that flow.
+ * Don't schedule this class directly: a scheduled class can't be deployed.
  *
  * Picks up Pending Requests, and Error Requests that have retries left. Each
  * Request gets its email address from the Contact or Lead behind its Public Id,

@@ -1,6 +1,7 @@
 /**
  * Schedules UnsubscribeRequestBatch from the setup flow, as the Admin running it
- * (ADR 0002). Any earlier schedule with the same job name is aborted first, so
+ * (ADR 0002). The job runs UnsubscribeRequestScheduler, which starts the batch by
+ * name so the batch stays deployable while the job is scheduled. Any earlier schedule with the same job name is aborted first, so
  * running the setup again applies a new interval and moves the job to the Admin
  * who ran it last.
  *
@@ -54,7 +55,7 @@ public with sharing class ScheduleRequestBatchInvocable {
     return System.schedule(
       JOB_NAME,
       cronExpression(intervalHours),
-      new UnsubscribeRequestBatch()
+      new UnsubscribeRequestScheduler()
     );
   }
 
