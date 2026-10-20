@@ -45,4 +45,11 @@ Smaller, independent items are listed first.
 - **Move settings to custom metadata.** If this happens, the batch interval and the retention period move along with the other settings.
 - **Warn about active Email Alerts.** Tell the Admin about Email Alerts or flows that send to Contacts or Leads, because those ignore Email Opt Out.
 - **Rename the unsubscribe page.** Give the flexipage `Unsubscribe_Link_4_0_020324_Unsubscribe` a shorter API name, and drop the old one from the package.
+- **Support LWR sites.** Tested by hand in a Trailhead Playground on an enhanced Build Your Own (LWR) site. A guest Unsubscribe worked end to end, and an old `/s/` link worked through a redirect. To finish:
+  - Build the link without `/s/` when the site is LWR. Enhanced LWR sites have no `/s` in the URL, so the links that `UUIDBatchJob` and both Set Public Id flows build today return 404. This overlaps with "Build the link from the Public Id" above.
+  - Set `allowPause` to false on the three `Unsubscribe_Link_Quick` screens that have it on. LWR doesn't support pausing.
+  - Document the LWR setup in the wiki. The packaged page template is Aura-only, so the Admin adds the Flow component by hand with `varRecId` set to `{!Route.varRecId}`. LWR also needs "Allow guest users to access public APIs" in Administration > Preferences.
+  - Find out whether that preference can be set by CLI or metadata.
+  - Keep old links working when a site moves from Aura to LWR ([ADR 0001](adr/0001-unsubscribe-links-never-expire.md)). A dynamic URL redirect `/Unsubscribe/s/unsubscribe?varRecId=(recId)` to `/unsubscribe?varRecId=(recId)` does this. It only matches when `varRecId` is the first query parameter. The Admin has to delete the Aura site to free the `Unsubscribe` prefix, so links are dead until the LWR site and the redirect are live.
+- **Open the setup flow from a tab.** Ship a Lightning App Page that holds only `Unsubscribe_Link_Setup`, plus a tab for it that the `Unsubscribe_Link` permission set makes visible. This replaces Setup > Flows > Run. First check that running the setup flow again doesn't create a second setup record. Give the tab a label that doesn't clash with the `Unsubscribe_Link_Setup__c` object tab.
 - **Preference center.** Let Recipients unsubscribe per topic. Out of scope until global Unsubscribe works well.
