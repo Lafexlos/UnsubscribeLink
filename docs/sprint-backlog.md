@@ -6,8 +6,8 @@ These items came out of a design session during the Salesforce Community Sprint,
 
 Smaller, independent items are listed first.
 
-- [ ] **Skip Contacts that are already opted out.** The Contacts lookup in `Unsubscribe_Contacts` filters on Email only. It should also filter `HasOptedOutOfEmail = false`, as the Leads lookup already does and as its own description says.
-- [ ] **Leave converted Leads out of the opt-out.** `Unsubscribe_Leads` does not filter on `IsConverted`, and converted Leads can't be updated. Reproduce the failure in a scratch org first. A link sent to a Lead before conversion must still resolve.
+- [x] **Skip Contacts that are already opted out.** The Contacts lookup in `Unsubscribe_Contacts` filters on Email only. It should also filter `HasOptedOutOfEmail = false`, as the Leads lookup already does and as its own description says.
+- [x] **Leave converted Leads out of the opt-out.** `Unsubscribe_Leads` does not filter on `IsConverted`, and converted Leads can't be updated. Reproduce the failure in a scratch org first. A link sent to a Lead before conversion must still resolve. Result: Apex fails with `CANNOT_UPDATE_CONVERTED_LEAD`, but the flow in `SystemModeWithoutSharing` updated the converted Lead without error, so the filter is a cleanup rather than a crash fix.
 - [ ] **Write the README section "What this package does and doesn't do".** It should say that the package records each Unsubscribe and sets Email Opt Out, and that whether email stops depends on the sending channel. Include the channel table:
 
   | Sending channel | Honors Email Opt Out |
