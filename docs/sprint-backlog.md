@@ -8,17 +8,17 @@ Smaller, independent items are listed first.
 
 - [ ] **Skip Contacts that are already opted out.** The Contacts lookup in `Unsubscribe_Contacts` filters on Email only. It should also filter `HasOptedOutOfEmail = false`, as the Leads lookup already does and as its own description says.
 - [ ] **Leave converted Leads out of the opt-out.** `Unsubscribe_Leads` does not filter on `IsConverted`, and converted Leads can't be updated. Reproduce the failure in a scratch org first. A link sent to a Lead before conversion must still resolve.
-- [ ] **Write the README section "What this package does and doesn't do".** It should say that the package records each Unsubscribe and sets Email Opt Out, and that whether email stops depends on the sending channel. Include the channel table:
+- [x] **Write the README section "What this package does and doesn't do".** It should say that the package records each Unsubscribe and sets Email Opt Out, and that whether email stops depends on the sending channel. Include the channel table:
 
   | Sending channel | Honors Email Opt Out |
   | --- | --- |
   | List Email and mass email | Yes |
   | Email Alerts | No |
   | Apex `SingleEmailMessage` | No, by default |
-  | Flow Send Email action | Unknown, see the next item |
+  | Flow Send Email action | No, tested October 2026 (see the next item) |
 
   Close the section with "helps with compliance, does not guarantee it".
-- [ ] **Test whether the Flow Send Email action honors Email Opt Out.** Run it in a scratch org and fill in that row of the README table.
+- [x] **Test whether the Flow Send Email action honors Email Opt Out.** Run it in a scratch org and fill in that row of the README table. Result is No. With Recipient ID set to an opted-out Contact, the action returned success and logged an EmailMessage with status Sent, the same as for a Contact that had not opted out. In the same org, Apex `SingleEmailMessage` with `optOutPolicy` set to `FILTER` or `REJECT` failed for that Contact with `EMAIL_OPTED_OUT`, so the org did see the opt-out.
 - [ ] **Assign Public Ids in an Apex before-insert trigger.** It replaces the Draft after-save flows `Contact_After_Create_Update_Set_Public_Id` and `Lead_After_Create_Update_Set_Public_Id`. Add a bypass switch for large imports. The existing backfill batch stays for records created before the trigger. Doing this drops the agenda item "friendly way to turn record-triggered flows on/off".
 - [ ] **Add a setup check to the setup flow.** It reports pass or fail for each of these:
   - The site exists and is published.
