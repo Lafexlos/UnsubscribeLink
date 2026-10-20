@@ -724,7 +724,7 @@ Customer facing flow of the Unsubscribe Link managed package from AppExchange. U
         <name>Email</name>
         <dataType>String</dataType>
         <isCollection>false</isCollection>
-        <isInput>true</isInput>
+        <isInput>false</isInput>
         <isOutput>false</isOutput>
     </variables>
     <variables>
@@ -732,7 +732,7 @@ Customer facing flow of the Unsubscribe Link managed package from AppExchange. U
         <name>ErrorRecipient</name>
         <dataType>String</dataType>
         <isCollection>false</isCollection>
-        <isInput>true</isInput>
+        <isInput>false</isInput>
         <isOutput>false</isOutput>
     </variables>
     <variables>
@@ -740,7 +740,7 @@ Customer facing flow of the Unsubscribe Link managed package from AppExchange. U
         <name>FoundId</name>
         <dataType>String</dataType>
         <isCollection>false</isCollection>
-        <isInput>true</isInput>
+        <isInput>false</isInput>
         <isOutput>false</isOutput>
     </variables>
     <variables>
@@ -748,7 +748,7 @@ Customer facing flow of the Unsubscribe Link managed package from AppExchange. U
         <name>getCListSize</name>
         <dataType>Number</dataType>
         <isCollection>false</isCollection>
-        <isInput>true</isInput>
+        <isInput>false</isInput>
         <isOutput>false</isOutput>
         <scale>0</scale>
     </variables>
@@ -757,7 +757,7 @@ Customer facing flow of the Unsubscribe Link managed package from AppExchange. U
         <name>lListsize</name>
         <dataType>Number</dataType>
         <isCollection>false</isCollection>
-        <isInput>true</isInput>
+        <isInput>false</isInput>
         <isOutput>false</isOutput>
         <scale>0</scale>
     </variables>
