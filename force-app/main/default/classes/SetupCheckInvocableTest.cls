@@ -114,7 +114,8 @@ private class SetupCheckInvocableTest {
       true,
       true,
       3,
-      1
+      1,
+      true
     );
 
     Assert.areEqual(3, result.contactsMissingPublicId, 'Contact count should be passed through');
@@ -214,7 +215,7 @@ private class SetupCheckInvocableTest {
     Test.stopTest();
 
     Assert.areEqual(2, results.size(), 'Expected one result per request');
-    Assert.isTrue(queriesUsed <= 5, 'Queries should not grow with the number of requests');
+    Assert.isTrue(queriesUsed <= 7, 'Queries should not grow with the number of requests');
     Assert.isFalse(results[1].orgWideEmailIsVerified, 'Unknown address should fail');
   }
 
@@ -294,5 +295,43 @@ private class SetupCheckInvocableTest {
       SetupCheckInvocable.isSitePublished(null, new List<SObject>()),
       'Missing site should fail'
     );
+  }
+
+  @IsTest
+  static void scheduledBatchPasses() {
+    for (CronTrigger job : [SELECT Id FROM CronTrigger WHERE CronJobDetail.Name = :ScheduleRequestBatchInvocable.JOB_NAME]) {
+      System.abortJob(job.Id);
+    }
+    System.schedule(ScheduleRequestBatchInvocable.JOB_NAME, '0 0 0/1 * * ?', new UnsubscribeRequestBatch());
+
+    Test.startTest();
+    SetupCheckInvocable.SetupCheckResult result = runSingle(null, null);
+    Test.stopTest();
+
+    Assert.isTrue(result.batchIsScheduled, 'A waiting job owned by an active user should pass');
+  }
+
+  @IsTest
+  static void missingBatchFails() {
+    // Scheduled jobs are not isolated from org data, so remove one the org may have
+    for (CronTrigger job : [SELECT Id FROM CronTrigger WHERE CronJobDetail.Name = :ScheduleRequestBatchInvocable.JOB_NAME]) {
+      System.abortJob(job.Id);
+    }
+
+    Test.startTest();
+    SetupCheckInvocable.SetupCheckResult result = runSingle(null, null);
+    Test.stopTest();
+
+    Assert.isFalse(result.batchIsScheduled, 'No scheduled job should fail');
+  }
+
+  @IsTest
+  static void brokenJobOrInactiveOwnerFails() {
+    Assert.isTrue(SetupCheckInvocable.isJobHealthy('WAITING', true), 'Waiting job with active owner should pass');
+    Assert.isTrue(SetupCheckInvocable.isJobHealthy('EXECUTING', true), 'Running job should pass');
+    Assert.isFalse(SetupCheckInvocable.isJobHealthy('ERROR', true), 'Job in error should fail');
+    Assert.isFalse(SetupCheckInvocable.isJobHealthy('COMPLETE', true), 'Job that will not run again should fail');
+    Assert.isFalse(SetupCheckInvocable.isJobHealthy('WAITING', false), 'Job of an inactive user should fail');
+    Assert.isFalse(SetupCheckInvocable.isJobHealthy(null, true), 'Missing state should fail');
   }
 }

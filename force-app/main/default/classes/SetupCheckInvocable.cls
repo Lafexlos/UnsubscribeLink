@@ -1,5 +1,8 @@
 /**
  * Runs the checks shown on the setup check screen of the Unsubscribe Link Setup flow.
+ * It also checks that the Unsubscribe Request batch is scheduled, not in an error
+ * state, and owned by an active user, because the job stops when its owner is
+ * deactivated (ADR 0002).
  * Runs without sharing so the Public Id counts cover every Contact and Lead, not only
  * the ones the running user can see. It returns only booleans and counts.
  */
@@ -14,10 +17,16 @@ public without sharing class SetupCheckInvocable {
   };
   // Dynamic query so the class still compiles in orgs without Experience Cloud.
   private static final String NETWORK_QUERY = 'SELECT Id, Name, Status, UrlPathPrefix FROM Network';
+  // CronTrigger states in which the job will not run again
+  private static final Set<String> BROKEN_JOB_STATES = new Set<String>{
+    'ERROR',
+    'COMPLETE',
+    'DELETED'
+  };
 
   @InvocableMethod(
     label='Run Unsubscribe Link Setup Check'
-    description='Checks the site, the org-wide email address and the Public Ids on Contacts and Leads'
+    description='Checks the site, the org-wide email address, the Public Ids on Contacts and Leads, and the scheduled Unsubscribe Request batch'
   )
   public static List<SetupCheckResult> runSetupCheck(
     List<SetupCheckRequest> requests
@@ -63,6 +72,7 @@ public without sharing class SetupCheckInvocable {
       FROM Lead
       WHERE Email != NULL AND Public_Id__c = NULL AND IsConverted = FALSE
     ];
+    Boolean batchIsScheduled = isBatchScheduled();
 
     for (SetupCheckRequest request : requests) {
       results.add(
@@ -70,7 +80,8 @@ public without sharing class SetupCheckInvocable {
           isSitePublished(sitesById.get(request.siteId), networks),
           isAddressVerified(request.orgWideEmailAddress, verifiedAddresses),
           contactsMissing,
-          leadsMissing
+          leadsMissing,
+          batchIsScheduled
         )
       );
     }
@@ -82,15 +93,46 @@ public without sharing class SetupCheckInvocable {
     Boolean siteIsPublished,
     Boolean orgWideEmailIsVerified,
     Integer contactsMissing,
-    Integer leadsMissing
+    Integer leadsMissing,
+    Boolean batchIsScheduled
   ) {
     SetupCheckResult result = new SetupCheckResult();
+    result.batchIsScheduled = batchIsScheduled;
     result.siteIsPublished = siteIsPublished;
     result.orgWideEmailIsVerified = orgWideEmailIsVerified;
     result.contactsMissingPublicId = contactsMissing;
     result.leadsMissingPublicId = leadsMissing;
     result.allPublicIdsSet = isEveryPublicIdSet(contactsMissing, leadsMissing);
     return result;
+  }
+
+  private static Boolean isBatchScheduled() {
+    List<CronTrigger> jobs = [
+      SELECT State, OwnerId
+      FROM CronTrigger
+      WHERE CronJobDetail.Name = :ScheduleRequestBatchInvocable.JOB_NAME
+      LIMIT 1
+    ];
+    if (jobs.isEmpty()) {
+      return false;
+    }
+    // CronTrigger has no Owner relationship, so the owner is read separately
+    List<User> owners = [
+      SELECT IsActive
+      FROM User
+      WHERE Id = :jobs[0].OwnerId
+    ];
+    return isJobHealthy(
+      jobs[0].State,
+      !owners.isEmpty() && owners[0].IsActive
+    );
+  }
+
+  @TestVisible
+  private static Boolean isJobHealthy(String state, Boolean ownerIsActive) {
+    return String.isNotBlank(state) &&
+      !BROKEN_JOB_STATES.contains(state) &&
+      ownerIsActive;
   }
 
   @TestVisible
@@ -237,5 +279,11 @@ public without sharing class SetupCheckInvocable {
       description='Number of unconverted Leads with an email address and no Public Id'
     )
     public Integer leadsMissingPublicId;
+
+    @InvocableVariable(
+      label='Batch Is Scheduled'
+      description='True when the Unsubscribe Request batch is scheduled, not in an error state, and its owner is active'
+    )
+    public Boolean batchIsScheduled;
   }
 }

@@ -96,4 +96,56 @@
         <label>E-mailadres</label>
         <name>Type_In_Email_Address_Label</name>
     </customLabels>
+    <customLabels>
+        <label>Afmeldverzoeken verwerken</label>
+        <name>Setup_Batch_Section_Title</name>
+    </customLabels>
+    <customLabels>
+        <label>De afmeldpagina legt alleen een afmeldverzoek vast. Een geplande taak meldt daarna de bijbehorende contacten en leads af en verstuurt de bevestigingsmail. De taak draait onder jouw gebruiker, de gebruiker die deze installatie uitvoert. Wordt je gebruiker gedeactiveerd, dan stopt de taak. Voer deze installatie daarom eerst opnieuw uit als een andere beheerder.</label>
+        <name>Setup_Batch_Section_Intro</name>
+    </customLabels>
+    <customLabels>
+        <label>Hoe vaak moeten afmeldverzoeken worden verwerkt? (uren)</label>
+        <name>Setup_Batch_Interval_Label</name>
+    </customLabels>
+    <customLabels>
+        <label>Na hoeveel dagen moeten niet gevonden afmeldverzoeken worden verwijderd?</label>
+        <name>Setup_Retention_Days_Label</name>
+    </customLabels>
+    <customLabels>
+        <label>Hoe vaak moet een mislukt afmeldverzoek worden geprobeerd?</label>
+        <name>Setup_Max_Retry_Label</name>
+    </customLabels>
+    <customLabels>
+        <label>Vul 1 of meer in.</label>
+        <name>Setup_Minimum_One_Error</name>
+    </customLabels>
+    <customLabels>
+        <label>Links van de oude, onbeheerde Unsubscribe Link-app accepteren</label>
+        <name>Setup_Legacy_Links_Label</name>
+    </customLabels>
+    <customLabels>
+        <label>Laat dit uit, tenzij je e-mails hebt verstuurd met de oude, onbeheerde Unsubscribe Link-app. Die links bevatten de record-Id van het contact of de lead in plaats van een Public Id. Record-Id's zijn veel makkelijker te raden dan Public Ids. Staat dit aan, dan kan iemand anderen afmelden door record-Id's uit te proberen.</label>
+        <name>Setup_Legacy_Links_Warning</name>
+    </customLabels>
+    <customLabels>
+        <label>De taak voor afmeldverzoeken kon niet worden ingepland.</label>
+        <name>Setup_Schedule_Error_Title</name>
+    </customLabels>
+    <customLabels>
+        <label>Afmeldverzoeken blijven in afwachting tot de taak draait. Los de onderstaande fout op en voer deze installatie opnieuw uit.</label>
+        <name>Setup_Schedule_Error_Hint</name>
+    </customLabels>
+    <customLabels>
+        <label>Geslaagd: de taak voor afmeldverzoeken is ingepland en draait onder een actieve gebruiker.</label>
+        <name>Setup_Check_Batch_Pass</name>
+    </customLabels>
+    <customLabels>
+        <label>Mislukt: de taak voor afmeldverzoeken ontbreekt, heeft een fout of draait onder een inactieve gebruiker.</label>
+        <name>Setup_Check_Batch_Fail</name>
+    </customLabels>
+    <customLabels>
+        <label>Voer deze installatie opnieuw uit als actieve beheerder. Dan wordt de taak opnieuw ingepland onder jouw gebruiker. Je ziet de taak in Setup onder Scheduled Jobs.</label>
+        <name>Setup_Check_Batch_Hint</name>
+    </customLabels>
 </Translations>

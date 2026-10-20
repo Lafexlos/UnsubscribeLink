@@ -20,22 +20,22 @@ Smaller, independent items are listed first.
   Close the section with "helps with compliance, does not guarantee it".
 - [x] **Test whether the Flow Send Email action honors Email Opt Out.** Run it in a scratch org and fill in that row of the README table. Result is No. With Recipient ID set to an opted-out Contact, the action returned success and logged an EmailMessage with status Sent, the same as for a Contact that had not opted out. In the same org, Apex `SingleEmailMessage` with `optOutPolicy` set to `FILTER` or `REJECT` failed for that Contact with `EMAIL_OPTED_OUT`, so the org did see the opt-out.
 - [x] **Assign Public Ids in an Apex before-insert trigger.** It replaces the Draft after-save flows `Contact_After_Create_Update_Set_Public_Id` and `Lead_After_Create_Update_Set_Public_Id`. Add a bypass switch for large imports. The existing backfill batch stays for records created before the trigger. Doing this drops the agenda item "friendly way to turn record-triggered flows on/off".
-- [ ] **Add a setup check to the setup flow.** It reports pass or fail for each of these:
+- [x] **Add a setup check to the setup flow.** It reports pass or fail for each of these:
   - [x] The site exists and is published.
   - [x] The org-wide email address is verified.
-  - [ ] The scheduled batch exists, and the user who scheduled it is active. TODO: pending [ADR 0002](adr/0002-guest-only-records-requests.md), because the batch doesn't exist yet. Add this check to `SetupCheckInvocable` and `Setup_Check_Screen` when the batch is built.
+  - [x] The scheduled batch exists, is not in an error state, and the user who scheduled it is active. Added to `SetupCheckInvocable` and `Setup_Check_Screen` with [ADR 0002](adr/0002-guest-only-records-requests.md).
   - [x] Every Contact and Lead with an email address has a Public Id.
 - [x] **Warn about type-in mode in the setup flow.** When the Admin turns type-in mode on, the setup flow says plainly that a script can unsubscribe any list of email addresses.
-- [ ] **Make the guest only record a Request** ([ADR 0002](adr/0002-guest-only-records-requests.md)). This is the largest item and may need splitting.
-  - Add the Pending and Not Found statuses to `Unsubscribe__c.Status__c`.
-  - Remove the guest flows' `SystemModeWithoutSharing` writes to Contacts and Leads.
-  - Add an existence-check action that runs without sharing and returns only true or false for a Public Id.
-  - Add a validation rule that requires `C` or `L` followed by a UUID v4.
-  - Add a unique Pending Key so a link has at most one Pending Request. The flow treats a duplicate insert as success.
-  - Build the scheduled batch. It processes Pending and Error Requests, opts out every Contact and Lead with the matching address, sends the Confirmation Email and sets the final status.
-  - The batch sends one digest per run, such as "312 Not Found, 2 Error", instead of one alert per Request.
-  - The batch deletes Not Found Requests after a retention period.
-  - Put the interval (default 1 hour) and the retention period (default 30 days) on `Unsubscribe_Link_Setup__c`. The setup flow schedules or reschedules the batch as the Admin running it.
+- [x] **Make the guest only record a Request** ([ADR 0002](adr/0002-guest-only-records-requests.md)). This is the largest item and may need splitting.
+  - [x] Add the Pending and Not Found statuses to `Unsubscribe__c.Status__c`.
+  - [x] Remove the guest flows' `SystemModeWithoutSharing` writes to Contacts and Leads.
+  - [x] Add an existence-check action that runs without sharing and returns only true or false for a Public Id.
+  - [x] Add a validation rule that requires `C` or `L` followed by a UUID v4.
+  - [x] Add a unique Pending Key so a link has at most one Pending Request. The flow treats a duplicate insert as success.
+  - [x] Build the scheduled batch. It processes Pending and Error Requests, opts out every Contact and Lead with the matching address, sends the Confirmation Email and sets the final status.
+  - [x] The batch sends one digest per run, such as "312 Not Found, 2 Error", instead of one alert per Request.
+  - [x] The batch deletes Not Found Requests after a retention period.
+  - [x] Put the interval (default 1 hour) and the retention period (default 30 days) on `Unsubscribe_Link_Setup__c`. The setup flow schedules or reschedules the batch as the Admin running it.
 
 ## Next sprint or known issues
 

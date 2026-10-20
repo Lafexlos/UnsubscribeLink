@@ -192,4 +192,108 @@
         <shortDescription>Label of the email field on the type-in screen</shortDescription>
         <value>Email address</value>
     </labels>
+    <labels>
+        <fullName>Setup_Batch_Section_Title</fullName>
+        <categories>Setup</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup flow section title for request processing</shortDescription>
+        <value>Processing Unsubscribe Requests</value>
+    </labels>
+    <labels>
+        <fullName>Setup_Batch_Section_Intro</fullName>
+        <categories>Setup</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup flow intro for request processing</shortDescription>
+        <value>The unsubscribe page only records an Unsubscribe Request. A scheduled job then opts out the matching Contacts and Leads and sends the confirmation email. The job runs as you, the user running this setup. If your user is deactivated, the job stops, so run this setup again as another Admin before that happens.</value>
+    </labels>
+    <labels>
+        <fullName>Setup_Batch_Interval_Label</fullName>
+        <categories>Setup</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup flow field label for the batch interval</shortDescription>
+        <value>How often should Unsubscribe Requests be processed? (hours)</value>
+    </labels>
+    <labels>
+        <fullName>Setup_Retention_Days_Label</fullName>
+        <categories>Setup</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup flow field label for retention days</shortDescription>
+        <value>After how many days should Not Found Unsubscribe Requests be deleted?</value>
+    </labels>
+    <labels>
+        <fullName>Setup_Max_Retry_Label</fullName>
+        <categories>Setup</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup flow field label for max retry attempts</shortDescription>
+        <value>How many times should a failed Unsubscribe Request be tried?</value>
+    </labels>
+    <labels>
+        <fullName>Setup_Minimum_One_Error</fullName>
+        <categories>Setup</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup flow error when a number is below 1</shortDescription>
+        <value>Enter 1 or more.</value>
+    </labels>
+    <labels>
+        <fullName>Setup_Legacy_Links_Label</fullName>
+        <categories>Setup</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup flow checkbox label for legacy links</shortDescription>
+        <value>Accept links from the old unmanaged Unsubscribe Link app</value>
+    </labels>
+    <labels>
+        <fullName>Setup_Legacy_Links_Warning</fullName>
+        <categories>Setup</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup flow text explaining the legacy link setting</shortDescription>
+        <value>Leave this off unless you sent emails with the old unmanaged Unsubscribe Link app. Those links contain the Contact or Lead record Id instead of a Public Id. Record Ids are much easier to guess than Public Ids, so with this on, someone could unsubscribe other people by trying record Ids.</value>
+    </labels>
+    <labels>
+        <fullName>Setup_Schedule_Error_Title</fullName>
+        <categories>Setup</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup flow title when scheduling fails</shortDescription>
+        <value>The Unsubscribe Request job could not be scheduled.</value>
+    </labels>
+    <labels>
+        <fullName>Setup_Schedule_Error_Hint</fullName>
+        <categories>Setup</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup flow hint when scheduling fails</shortDescription>
+        <value>Unsubscribe Requests stay Pending until the job runs. Fix the error below and run this setup again.</value>
+    </labels>
+    <labels>
+        <fullName>Setup_Check_Batch_Pass</fullName>
+        <categories>Setup</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup check scheduled job pass</shortDescription>
+        <value>Pass: The Unsubscribe Request job is scheduled and runs as an active user.</value>
+    </labels>
+    <labels>
+        <fullName>Setup_Check_Batch_Fail</fullName>
+        <categories>Setup</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup check scheduled job fail</shortDescription>
+        <value>Fail: The Unsubscribe Request job is missing, has an error, or runs as an inactive user.</value>
+    </labels>
+    <labels>
+        <fullName>Setup_Check_Batch_Hint</fullName>
+        <categories>Setup</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup check scheduled job fix hint</shortDescription>
+        <value>Run this setup again as an active Admin. That schedules the job again under your user. You can see the job in Setup under Scheduled Jobs.</value>
+    </labels>
 </CustomLabels>

@@ -40,7 +40,7 @@
         <actionName>UUIDBatchInvocable</actionName>
         <actionType>apex</actionType>
         <connector>
-            <targetReference>Run_Setup_Check</targetReference>
+            <targetReference>Schedule_Request_Batch</targetReference>
         </connector>
         <flowTransactionModel>Automatic</flowTransactionModel>
         <inputParameters>
@@ -89,6 +89,31 @@
             </value>
         </inputParameters>
         <nameSegment>SetupCheckInvocable</nameSegment>
+        <offset>0</offset>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </actionCalls>
+    <actionCalls>
+        <description>Schedules the Unsubscribe Request batch as the user running this flow, replacing any earlier schedule (ADR 0002).</description>
+        <name>Schedule_Request_Batch</name>
+        <label>Schedule Request Batch</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <actionName>ScheduleRequestBatchInvocable</actionName>
+        <actionType>apex</actionType>
+        <connector>
+            <targetReference>Run_Setup_Check</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Schedule_Error_Screen</targetReference>
+        </faultConnector>
+        <flowTransactionModel>Automatic</flowTransactionModel>
+        <inputParameters>
+            <name>intervalHours</name>
+            <value>
+                <elementReference>var_FinalRecord.Batch_Interval_Hours__c</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>ScheduleRequestBatchInvocable</nameSegment>
         <offset>0</offset>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </actionCalls>
@@ -317,6 +342,34 @@
                 <elementReference>$User.Email</elementReference>
             </value>
         </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_FinalRecord.Batch_Interval_Hours__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>DefaultBatchIntervalHours</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_FinalRecord.Retention_Days__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>DefaultRetentionDays</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_FinalRecord.Max_Retry_Attempts__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>DefaultMaxRetryAttempts</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_FinalRecord.Accept_Legacy_Record_Id_Links__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </assignmentItems>
         <connector>
             <targetReference>Set_Up_Unsubscribe_Link_0</targetReference>
         </connector>
@@ -418,6 +471,34 @@
                 <elementReference>getULSetup.Org_Wide_Email_Address__c</elementReference>
             </value>
         </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_FinalRecord.Batch_Interval_Hours__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>frm_ExistingBatchIntervalHours</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_FinalRecord.Retention_Days__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>frm_ExistingRetentionDays</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_FinalRecord.Max_Retry_Attempts__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>frm_ExistingMaxRetryAttempts</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_FinalRecord.Accept_Legacy_Record_Id_Links__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>getULSetup.Accept_Legacy_Record_Id_Links__c</elementReference>
+            </value>
+        </assignmentItems>
         <connector>
             <targetReference>Set_Up_Unsubscribe_Link_0</targetReference>
         </connector>
@@ -447,6 +528,34 @@
             <operator>Assign</operator>
             <value>
                 <elementReference>type_in_unsubscribe</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_FinalRecord.Batch_Interval_Hours__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Batch_Interval_Hours</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_FinalRecord.Retention_Days__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Retention_Days</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_FinalRecord.Max_Retry_Attempts__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Max_Retry_Attempts</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>var_FinalRecord.Accept_Legacy_Record_Id_Links__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Accept_Legacy_Record_Id_Links</elementReference>
             </value>
         </assignmentItems>
         <connector>
@@ -493,6 +602,30 @@
             <stringValue>Yes</stringValue>
         </value>
     </choices>
+    <constants>
+        <description>Default of Batch_Interval_Hours__c, used on first setup and when the field is blank.</description>
+        <name>DefaultBatchIntervalHours</name>
+        <dataType>String</dataType>
+        <value>
+            <stringValue>1</stringValue>
+        </value>
+    </constants>
+    <constants>
+        <description>Default of Max_Retry_Attempts__c, used on first setup and when the field is blank.</description>
+        <name>DefaultMaxRetryAttempts</name>
+        <dataType>Number</dataType>
+        <value>
+            <numberValue>5.0</numberValue>
+        </value>
+    </constants>
+    <constants>
+        <description>Default of Retention_Days__c, used on first setup and when the field is blank.</description>
+        <name>DefaultRetentionDays</name>
+        <dataType>Number</dataType>
+        <value>
+            <numberValue>30.0</numberValue>
+        </value>
+    </constants>
     <constants>
         <description>Name of the Site that hosts the unsubscribe page. Matches SITE_NAME in UUIDBatchJob, which builds the links.</description>
         <name>UnsubscribeSiteName</name>
@@ -667,6 +800,13 @@ Changed the 1st assignment to use the Error Email Recipient from the Get instead
 Removed Current User formula.
 Added path Progress Indicator.</description>
     <dynamicChoiceSets>
+        <description>Values of the Batch_Interval_Hours__c picklist.</description>
+        <name>BatchIntervalChoices</name>
+        <dataType>Picklist</dataType>
+        <picklistField>Batch_Interval_Hours__c</picklistField>
+        <picklistObject>Unsubscribe_Link_Setup__c</picklistObject>
+    </dynamicChoiceSets>
+    <dynamicChoiceSets>
         <description>Pick another org wide email to get an error message.</description>
         <name>ErrorEmailAddress</name>
         <dataType>String</dataType>
@@ -716,6 +856,26 @@ Added path Progress Indicator.</description>
         <name>EnableOneClickFormula</name>
         <dataType>String</dataType>
         <expression>IF({!EnableOneClick}=&apos;Yes&apos;, &apos;No&apos;, &apos;Yes&apos;)</expression>
+    </formulas>
+    <formulas>
+        <description>Saved batch interval, or the default when it is blank.</description>
+        <name>frm_ExistingBatchIntervalHours</name>
+        <dataType>String</dataType>
+        <expression>IF(ISBLANK(TEXT({!getULSetup.Batch_Interval_Hours__c})), {!DefaultBatchIntervalHours}, TEXT({!getULSetup.Batch_Interval_Hours__c}))</expression>
+    </formulas>
+    <formulas>
+        <description>Saved max retry attempts, or the default when it is blank.</description>
+        <name>frm_ExistingMaxRetryAttempts</name>
+        <dataType>Number</dataType>
+        <expression>BLANKVALUE({!getULSetup.Max_Retry_Attempts__c}, {!DefaultMaxRetryAttempts})</expression>
+        <scale>0</scale>
+    </formulas>
+    <formulas>
+        <description>Saved retention days, or the default when it is blank.</description>
+        <name>frm_ExistingRetentionDays</name>
+        <dataType>Number</dataType>
+        <expression>BLANKVALUE({!getULSetup.Retention_Days__c}, {!DefaultRetentionDays})</expression>
+        <scale>0</scale>
     </formulas>
     <formulas>
         <name>frm_screen2part2</name>
@@ -1829,11 +1989,156 @@ Added path Progress Indicator.</description>
                 </width>
             </styleProperties>
         </fields>
+        <fields>
+            <name>RequestProcessingDisplayText</name>
+            <fieldText>&lt;p&gt;{!horizontalLine1}&lt;/p&gt;&lt;p&gt;&lt;strong style=&quot;font-size: 16px;&quot;&gt;{!$Label.Setup_Batch_Section_Title}&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;{!$Label.Setup_Batch_Section_Intro}&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+        </fields>
+        <fields>
+            <name>Batch_Interval_Hours</name>
+            <choiceReferences>BatchIntervalChoices</choiceReferences>
+            <dataType>String</dataType>
+            <defaultValue>
+                <elementReference>var_FinalRecord.Batch_Interval_Hours__c</elementReference>
+            </defaultValue>
+            <fieldText>{!$Label.Setup_Batch_Interval_Label}</fieldText>
+            <fieldType>DropdownBox</fieldType>
+            <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+            <isRequired>true</isRequired>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+        </fields>
+        <fields>
+            <name>Retention_Days</name>
+            <dataType>Number</dataType>
+            <defaultValue>
+                <elementReference>var_FinalRecord.Retention_Days__c</elementReference>
+            </defaultValue>
+            <fieldText>{!$Label.Setup_Retention_Days_Label}</fieldText>
+            <fieldType>InputField</fieldType>
+            <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+            <isRequired>true</isRequired>
+            <scale>0</scale>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+            <validationRule>
+                <errorMessage>&lt;p&gt;{!$Label.Setup_Minimum_One_Error}&lt;/p&gt;</errorMessage>
+                <formulaExpression>{!Retention_Days} &gt;= 1</formulaExpression>
+            </validationRule>
+        </fields>
+        <fields>
+            <name>Max_Retry_Attempts</name>
+            <dataType>Number</dataType>
+            <defaultValue>
+                <elementReference>var_FinalRecord.Max_Retry_Attempts__c</elementReference>
+            </defaultValue>
+            <fieldText>{!$Label.Setup_Max_Retry_Label}</fieldText>
+            <fieldType>InputField</fieldType>
+            <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+            <isRequired>true</isRequired>
+            <scale>0</scale>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+            <validationRule>
+                <errorMessage>&lt;p&gt;{!$Label.Setup_Minimum_One_Error}&lt;/p&gt;</errorMessage>
+                <formulaExpression>{!Max_Retry_Attempts} &gt;= 1</formulaExpression>
+            </validationRule>
+        </fields>
+        <fields>
+            <name>LegacyLinksWarning</name>
+            <fieldText>&lt;p&gt;&lt;strong style=&quot;color: rgb(186, 5, 23);&quot;&gt;{!$Label.Setup_Legacy_Links_Warning}&lt;/strong&gt;&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+        </fields>
+        <fields>
+            <name>Accept_Legacy_Record_Id_Links</name>
+            <dataType>Boolean</dataType>
+            <defaultValue>
+                <elementReference>var_FinalRecord.Accept_Legacy_Record_Id_Links__c</elementReference>
+            </defaultValue>
+            <fieldText>{!$Label.Setup_Legacy_Links_Label}</fieldText>
+            <fieldType>InputField</fieldType>
+            <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+            <isRequired>true</isRequired>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+        </fields>
         <nextOrFinishButtonLabel>Next</nextOrFinishButtonLabel>
         <showFooter>true</showFooter>
         <showHeader>false</showHeader>
         <stageReference>
             <elementReference>Initial_Configuration</elementReference>
+        </stageReference>
+    </screens>
+    <screens>
+        <description>Shown when the Unsubscribe Request batch could not be scheduled. The setup continues to the setup check, which reports the missing job.</description>
+        <name>Schedule_Error_Screen</name>
+        <label>Schedule Error</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <allowBack>false</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <connector>
+            <isGoTo>true</isGoTo>
+            <targetReference>Run_Setup_Check</targetReference>
+        </connector>
+        <fields>
+            <name>ScheduleErrorText</name>
+            <fieldText>&lt;p&gt;&lt;strong style=&quot;color: rgb(186, 5, 23);&quot;&gt;{!$Label.Setup_Schedule_Error_Title}&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;{!$Label.Setup_Schedule_Error_Hint}&lt;/p&gt;&lt;p&gt;{!$Flow.FaultMessage}&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>false</showHeader>
+        <stageReference>
+            <elementReference>Complete</elementReference>
         </stageReference>
     </screens>
     <screens>
@@ -2006,6 +2311,52 @@ Added path Progress Indicator.</description>
                 <conditionLogic>and</conditionLogic>
                 <conditions>
                     <leftValueReference>Run_Setup_Check.allPublicIdsSet</leftValueReference>
+                    <operator>EqualTo</operator>
+                    <rightValue>
+                        <booleanValue>false</booleanValue>
+                    </rightValue>
+                </conditions>
+            </visibilityRule>
+        </fields>
+        <fields>
+            <name>SetupCheckBatchPass</name>
+            <fieldText>&lt;p&gt;&lt;strong&gt;{!$Label.Setup_Check_Batch_Pass}&lt;/strong&gt;&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+            <visibilityRule>
+                <conditionLogic>and</conditionLogic>
+                <conditions>
+                    <leftValueReference>Run_Setup_Check.batchIsScheduled</leftValueReference>
+                    <operator>EqualTo</operator>
+                    <rightValue>
+                        <booleanValue>true</booleanValue>
+                    </rightValue>
+                </conditions>
+            </visibilityRule>
+        </fields>
+        <fields>
+            <name>SetupCheckBatchFail</name>
+            <fieldText>&lt;p&gt;&lt;strong&gt;{!$Label.Setup_Check_Batch_Fail}&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;{!$Label.Setup_Check_Batch_Hint}&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+            <visibilityRule>
+                <conditionLogic>and</conditionLogic>
+                <conditions>
+                    <leftValueReference>Run_Setup_Check.batchIsScheduled</leftValueReference>
                     <operator>EqualTo</operator>
                     <rightValue>
                         <booleanValue>false</booleanValue>
