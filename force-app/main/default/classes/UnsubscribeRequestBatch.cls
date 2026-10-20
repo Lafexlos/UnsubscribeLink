@@ -9,7 +9,9 @@
  * Confirmation Email when the setup asks for it, and sets the final status:
  * - Unsubscribed when every matching record was opted out,
  * - Error when an update failed. It is retried until Max_Retry_Attempts__c,
- *   then its Pending Key is cleared so a new click can create a new Request,
+ *   then its Pending Key is cleared so a new click can create a new Request.
+ *   An Error Request that already reached a lowered limit gets the same
+ *   treatment without another attempt, so no link stays blocked,
  * - Not Found when no Contact or Lead matches. This is final.
  *
  * finish() sends one digest to the error recipient when anything needs the
@@ -78,7 +80,9 @@ public without sharing class UnsubscribeRequestBatch implements Database.Batchab
 
   public Database.QueryLocator start(Database.BatchableContext context) {
     Integer maxAttempts = getSettings().maxAttempts;
-    // Error Requests with no attempts were set by the old flows and are not retried
+    // Error Requests with no attempts were set by the old flows and are not retried.
+    // Error Requests at or over the limit that still hold a Pending Key are picked
+    // up once more, only to free the key after the Admin lowered the limit.
     return Database.getQueryLocator(
       [
         SELECT
@@ -93,7 +97,8 @@ public without sharing class UnsubscribeRequestBatch implements Database.Batchab
           Status__c = :STATUS_PENDING
           OR (Status__c = :STATUS_ERROR
           AND Attempt_Count__c > 0
-          AND Attempt_Count__c < :maxAttempts)
+          AND (Attempt_Count__c < :maxAttempts
+          OR Pending_Key__c != NULL))
         ORDER BY CreatedDate
       ]
     );
@@ -117,6 +122,17 @@ public without sharing class UnsubscribeRequestBatch implements Database.Batchab
       return;
     }
     RequestSettings config = getSettings();
+    List<Unsubscribe__c> updates = new List<Unsubscribe__c>();
+    List<Unsubscribe__c> toProcess = new List<Unsubscribe__c>();
+    for (Unsubscribe__c request : requests) {
+      if (hasNoRetriesLeft(request, config.maxAttempts)) {
+        markGivenUp(request);
+        updates.add(request);
+      } else {
+        toProcess.add(request);
+      }
+    }
+    requests = toProcess;
     Map<Id, SObject> linkedRecords = findLinkedRecords(
       requests,
       config.acceptLegacyRecordIds
@@ -139,7 +155,6 @@ public without sharing class UnsubscribeRequestBatch implements Database.Batchab
     Map<String, String> errorByAddress = optOut(matches);
 
     Set<String> addressesToConfirm = new Set<String>();
-    List<Unsubscribe__c> updates = new List<Unsubscribe__c>();
     for (Unsubscribe__c request : requests) {
       String address = addressByRequestId.get(request.Id);
       SObject matchedRecord = String.isBlank(request.Public_Id__c)
@@ -328,12 +343,27 @@ public without sharing class UnsubscribeRequestBatch implements Database.Batchab
     request.Attempt_Count__c = attempts;
     request.Error_Message__c = message.left(ERROR_MESSAGE_LENGTH);
     if (attempts >= maxAttempts) {
-      // Gave up: a new click can now create a fresh Request
-      request.Pending_Key__c = null;
-      gaveUpCount++;
+      markGivenUp(request);
     } else {
       retryingCount++;
     }
+  }
+
+  // An Error Request whose attempts already reached a lowered limit
+  private static Boolean hasNoRetriesLeft(
+    Unsubscribe__c request,
+    Integer maxAttempts
+  ) {
+    return request.Status__c == STATUS_ERROR &&
+      request.Attempt_Count__c != null &&
+      request.Attempt_Count__c >= maxAttempts;
+  }
+
+  // Gave up: a new click can now create a fresh Request. Counted once, because
+  // a Request without a Pending Key is not picked up again.
+  private void markGivenUp(Unsubscribe__c request) {
+    request.Pending_Key__c = null;
+    gaveUpCount++;
   }
 
   private void markNotFound(Unsubscribe__c request) {

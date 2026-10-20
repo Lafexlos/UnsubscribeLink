@@ -75,6 +75,14 @@ private class UnsubscribeRequestBatchTest {
     Test.stopTest();
   }
 
+  // The fields start() selects, for tests that call processRequests directly
+  private static List<Unsubscribe__c> queueRequests() {
+    return [
+      SELECT Id, Status__c, Public_Id__c, Pending_Key__c, Unsubscribe_Email__c, Attempt_Count__c
+      FROM Unsubscribe__c
+    ];
+  }
+
   private static Unsubscribe__c reload(Id requestId) {
     return [
       SELECT
@@ -252,10 +260,10 @@ private class UnsubscribeRequestBatchTest {
     UnsubscribeRequestBatch batch = new UnsubscribeRequestBatch();
 
     // Max_Retry_Attempts__c is 3 in the setup
-    batch.processRequests([SELECT Id, Public_Id__c, Unsubscribe_Email__c, Attempt_Count__c FROM Unsubscribe__c]);
+    batch.processRequests(queueRequests());
     Unsubscribe__c afterFirst = reload(request.Id);
-    batch.processRequests([SELECT Id, Public_Id__c, Unsubscribe_Email__c, Attempt_Count__c FROM Unsubscribe__c]);
-    batch.processRequests([SELECT Id, Public_Id__c, Unsubscribe_Email__c, Attempt_Count__c FROM Unsubscribe__c]);
+    batch.processRequests(queueRequests());
+    batch.processRequests(queueRequests());
     Unsubscribe__c afterLast = reload(request.Id);
 
     Assert.areEqual(UnsubscribeRequestBatch.STATUS_ERROR, afterFirst.Status__c, 'Failed update should set Error');
@@ -309,6 +317,53 @@ private class UnsubscribeRequestBatchTest {
   }
 
   @IsTest
+  static void loweredLimitFreesStuckErrorRequests() {
+    // Max_Retry_Attempts__c is 3 in the setup, these Requests failed under a higher limit
+    insertSetup(false);
+    Contact contact = insertContact('Stuck', SHARED_ADDRESS);
+    Unsubscribe__c stuck = new Unsubscribe__c(
+      Public_Id__c = UnsubscribeLinkBuilder.CONTACT_LETTER + contact.Public_Id__c,
+      Pending_Key__c = UnsubscribeLinkBuilder.CONTACT_LETTER + contact.Public_Id__c,
+      Status__c = 'Error',
+      Attempt_Count__c = 4,
+      Error_Message__c = SIMULATED_ERROR
+    );
+    Unsubscribe__c alreadyFreed = new Unsubscribe__c(
+      Unsubscribe_Email__c = 'freed' + EMAIL_DOMAIN,
+      Status__c = 'Error',
+      Attempt_Count__c = 4
+    );
+    insert new List<Unsubscribe__c>{ stuck, alreadyFreed };
+
+    Database.QueryLocatorIterator iterator = new UnsubscribeRequestBatch().start(null).iterator();
+    Set<Id> selected = new Set<Id>();
+    while (iterator.hasNext()) {
+      selected.add(iterator.next().Id);
+    }
+    UnsubscribeRequestBatch batch = new UnsubscribeRequestBatch();
+    List<Unsubscribe__c> picked = new List<Unsubscribe__c>();
+    for (Unsubscribe__c request : queueRequests()) {
+      if (selected.contains(request.Id)) {
+        picked.add(request);
+      }
+    }
+    batch.processRequests(picked);
+    Unsubscribe__c saved = reload(stuck.Id);
+
+    Assert.areEqual(new Set<Id>{ stuck.Id }, selected, 'Only the Request that still blocks its link should be picked up');
+    Assert.isNull(saved.Pending_Key__c, 'The Pending Key should be freed');
+    Assert.areEqual(UnsubscribeRequestBatch.STATUS_ERROR, saved.Status__c, 'The Request should stay Error');
+    Assert.areEqual(4, saved.Attempt_Count__c, 'No new attempt should be made');
+    Assert.isFalse([SELECT HasOptedOutOfEmail FROM Contact WHERE Id = :contact.Id].HasOptedOutOfEmail, 'Nothing should be retried');
+    Assert.areEqual(1, batch.gaveUpCount, 'The stuck Request should be reported as given up');
+    Assert.isTrue(batch.needsAttention(), 'Given-up Requests belong in the digest');
+
+    UnsubscribeRequestBatch nextRun = new UnsubscribeRequestBatch();
+    Database.QueryLocatorIterator nextIterator = nextRun.start(null).iterator();
+    Assert.isFalse(nextIterator.hasNext(), 'A freed Request is not picked up again, so it is reported once');
+  }
+
+  @IsTest
   static void bulkRequestsUseConstantQueries() {
     List<Contact> contacts = new List<Contact>();
     for (Integer i = 0; i < BULK_SIZE; i++) {
@@ -323,7 +378,7 @@ private class UnsubscribeRequestBatchTest {
     UnsubscribeRequestBatch batch = new UnsubscribeRequestBatch();
 
     Test.startTest();
-    batch.processRequests([SELECT Id, Public_Id__c, Unsubscribe_Email__c, Attempt_Count__c FROM Unsubscribe__c]);
+    batch.processRequests(queueRequests());
     Integer queriesUsed = Limits.getQueries();
     Test.stopTest();
 
@@ -356,7 +411,7 @@ private class UnsubscribeRequestBatchTest {
     batch.settings.orgWideAddressId = UserInfo.getUserId();
     batch.settings.confirmationBody = CONFIRMATION_TEXT;
 
-    batch.processRequests([SELECT Id, Public_Id__c, Unsubscribe_Email__c, Attempt_Count__c FROM Unsubscribe__c]);
+    batch.processRequests(queueRequests());
 
     Assert.areEqual(1, UnsubscribeRequestBatch.sentConfirmations.size(), 'One email per address');
     Messaging.SingleEmailMessage message = UnsubscribeRequestBatch.sentConfirmations[0];
@@ -375,7 +430,7 @@ private class UnsubscribeRequestBatchTest {
     batch.settings.sendConfirmation = true;
     batch.settings.confirmationBody = CONFIRMATION_TEXT;
 
-    batch.processRequests([SELECT Id, Public_Id__c, Unsubscribe_Email__c, Attempt_Count__c FROM Unsubscribe__c]);
+    batch.processRequests(queueRequests());
 
     Assert.isTrue(UnsubscribeRequestBatch.sentConfirmations.isEmpty(), 'No email without a verified org-wide address');
     Assert.areEqual(1, batch.unsubscribedCount, 'The Request should still be Unsubscribed');
