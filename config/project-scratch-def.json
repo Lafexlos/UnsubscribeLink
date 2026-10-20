@@ -14,7 +14,10 @@
       },
       "experienceBundleSettings": {
             "enableExperienceBundleMetadata": true
-        }
+        },
+      "languageSettings": {
+        "enableTranslationWorkbench": true
+      }
         }
 }
 

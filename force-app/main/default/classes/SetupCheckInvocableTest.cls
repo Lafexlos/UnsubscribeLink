@@ -2,6 +2,8 @@
 private class SetupCheckInvocableTest {
   private static final String EMAIL_DOMAIN = '@setupcheck.example.com';
   private static final String UNKNOWN_ADDRESS = 'nobody' + EMAIL_DOMAIN;
+  private static final String SITE_LABEL = 'Unsubscribe';
+  private static final String SITE_PATH = 'Unsubscribe';
 
   private static SetupCheckInvocable.SetupCheckResult runSingle(
     Id siteId,
@@ -17,11 +19,21 @@ private class SetupCheckInvocableTest {
     return results[0];
   }
 
-  private static Site buildSite(String status, String siteType, String path) {
+  // Shapes below match the Site and Network records of a real Experience site:
+  // Site 'Unsubscribe' (ChatterNetwork, path 'Unsubscribe'),
+  // Site 'Unsubscribe1' (ChatterNetworkPicasso, path 'Unsubscribe/s') and
+  // Network 'Unsubscribe' (path 'Unsubscribe').
+  private static Site buildSite(
+    String label,
+    String status,
+    String siteType,
+    String path
+  ) {
     return (Site) JSON.deserialize(
       JSON.serialize(
         new Map<String, Object>{
           'attributes' => new Map<String, Object>{ 'type' => 'Site' },
+          'MasterLabel' => label,
           'Status' => status,
           'SiteType' => siteType,
           'UrlPathPrefix' => path
@@ -31,18 +43,41 @@ private class SetupCheckInvocableTest {
     );
   }
 
-  private static List<SObject> buildNetworks(String status, String path) {
+  private static List<SObject> buildNetworks(
+    String name,
+    String status,
+    String path
+  ) {
     return (List<SObject>) JSON.deserialize(
       JSON.serialize(
         new List<Object>{
           new Map<String, Object>{
             'attributes' => new Map<String, Object>{ 'type' => 'Network' },
+            'Name' => name,
             'Status' => status,
             'UrlPathPrefix' => path
           }
         }
       ),
       List<SObject>.class
+    );
+  }
+
+  private static OrgWideEmailAddress buildAddress(
+    String address,
+    Boolean isVerified
+  ) {
+    return (OrgWideEmailAddress) JSON.deserialize(
+      JSON.serialize(
+        new Map<String, Object>{
+          'attributes' => new Map<String, Object>{
+            'type' => 'OrgWideEmailAddress'
+          },
+          'Address' => address,
+          'IsVerified' => isVerified
+        }
+      ),
+      OrgWideEmailAddress.class
     );
   }
 
@@ -72,38 +107,19 @@ private class SetupCheckInvocableTest {
   }
 
   @isTest
-  static void publicIdsMissingFails() {
-    List<Contact> contacts = new List<Contact>();
-    for (Integer i = 0; i < 3; i++) {
-      contacts.add(new Contact(LastName = 'Missing ' + i, Email = 'c' + i + EMAIL_DOMAIN));
-    }
-    insert contacts;
-    insert new Lead(LastName = 'Missing', Company = 'Setup Check', Email = 'l' + EMAIL_DOMAIN);
-
-    // Automation that assigns Public Ids on save may be active in the org,
-    // so compare against what is actually missing after the inserts.
-    Integer expectedContacts = [
-      SELECT COUNT()
-      FROM Contact
-      WHERE Email != NULL AND Public_Id__c = NULL
-    ];
-    Integer expectedLeads = [
-      SELECT COUNT()
-      FROM Lead
-      WHERE Email != NULL AND Public_Id__c = NULL AND IsConverted = FALSE
-    ];
-
-    Test.startTest();
-    SetupCheckInvocable.SetupCheckResult result = runSingle(null, null);
-    Test.stopTest();
-
-    Assert.areEqual(expectedContacts, result.contactsMissingPublicId, 'Contact count should match the records missing a Public Id');
-    Assert.areEqual(expectedLeads, result.leadsMissingPublicId, 'Lead count should match the records missing a Public Id');
-    Assert.areEqual(
-      expectedContacts == 0 && expectedLeads == 0,
-      result.allPublicIdsSet,
-      'Public Id check should fail when any record is missing a Public Id'
+  static void missingPublicIdsFailTheCheck() {
+    // Automation that assigns Public Ids on save makes missing ids impossible
+    // to set up with data, so the result is built from fixed counts.
+    SetupCheckInvocable.SetupCheckResult result = SetupCheckInvocable.buildResult(
+      true,
+      true,
+      3,
+      1
     );
+
+    Assert.areEqual(3, result.contactsMissingPublicId, 'Contact count should be passed through');
+    Assert.areEqual(1, result.leadsMissingPublicId, 'Lead count should be passed through');
+    Assert.isFalse(result.allPublicIdsSet, 'Public Id check should fail');
   }
 
   @isTest
@@ -152,31 +168,36 @@ private class SetupCheckInvocableTest {
   }
 
   @isTest
-  static void blankAddressFails() {
-    SetupCheckInvocable.SetupCheckResult result = runSingle(null, '');
+  static void verifiedAddressPasses() {
+    Set<String> verified = SetupCheckInvocable.collectVerifiedAddresses(
+      new List<OrgWideEmailAddress>{ buildAddress('Sender' + EMAIL_DOMAIN, true) }
+    );
 
-    Assert.isFalse(result.orgWideEmailIsVerified, 'Blank address should fail');
+    Assert.isTrue(
+      SetupCheckInvocable.isAddressVerified('sender' + EMAIL_DOMAIN, verified),
+      'Verified address should pass, ignoring case'
+    );
   }
 
   @isTest
-  static void verifiedAddressPasses() {
-    List<OrgWideEmailAddress> verified = [
-      SELECT Address
-      FROM OrgWideEmailAddress
-      WHERE IsVerified = TRUE
-      LIMIT 1
-    ];
-    if (verified.isEmpty()) {
-      // Verification needs a click in a real inbox, so a test can't create one.
-      return;
-    }
-
-    SetupCheckInvocable.SetupCheckResult result = runSingle(
-      null,
-      verified[0].Address.toUpperCase()
+  static void unverifiedOrBlankAddressFails() {
+    Set<String> verified = SetupCheckInvocable.collectVerifiedAddresses(
+      new List<OrgWideEmailAddress>{
+        buildAddress('pending' + EMAIL_DOMAIN, false),
+        buildAddress('sender' + EMAIL_DOMAIN, true)
+      }
     );
 
-    Assert.isTrue(result.orgWideEmailIsVerified, 'Verified address should pass, ignoring case');
+    Assert.isFalse(
+      SetupCheckInvocable.isAddressVerified('pending' + EMAIL_DOMAIN, verified),
+      'Unverified address should fail'
+    );
+    Assert.isFalse(
+      SetupCheckInvocable.isAddressVerified(UNKNOWN_ADDRESS, verified),
+      'Address that is not an org-wide address should fail'
+    );
+    Assert.isFalse(SetupCheckInvocable.isAddressVerified('', verified), 'Blank address should fail');
+    Assert.isFalse(SetupCheckInvocable.isAddressVerified(null, verified), 'Null address should fail');
   }
 
   @isTest
@@ -207,23 +228,39 @@ private class SetupCheckInvocableTest {
 
   @isTest
   static void activeSiteWithLiveNetworkPasses() {
+    List<SObject> liveNetwork = buildNetworks(SITE_LABEL, 'Live', SITE_PATH);
+
     Assert.isTrue(
       SetupCheckInvocable.isSitePublished(
-        buildSite('Active', 'ChatterNetwork', 'Unsubscribe'),
-        buildNetworks('Live', 'Unsubscribe')
+        buildSite(SITE_LABEL, 'Active', 'ChatterNetwork', SITE_PATH),
+        liveNetwork
       ),
       'Active site with a live network should pass'
     );
     Assert.isTrue(
       SetupCheckInvocable.isSitePublished(
-        buildSite('Active', 'ChatterNetworkPicasso', 'Unsubscribe/s'),
-        buildNetworks('Live', 'Unsubscribe')
+        buildSite(SITE_LABEL, 'Active', 'ChatterNetworkPicasso', SITE_PATH + '/s'),
+        liveNetwork
       ),
       'The /s path of a live network should pass'
     );
     Assert.isTrue(
       SetupCheckInvocable.isSitePublished(
-        buildSite('Active', 'Visualforce', 'unsubscribe'),
+        buildSite(SITE_LABEL, 'Active', 'ChatterNetwork', 'unsubscribevforcesite'),
+        liveNetwork
+      ),
+      'A vforcesite path of a live network should pass'
+    );
+    Assert.isTrue(
+      SetupCheckInvocable.isSitePublished(
+        buildSite(SITE_LABEL, 'Active', 'ChatterNetwork', 'somethingelse'),
+        liveNetwork
+      ),
+      'A site whose label matches a live network name should pass'
+    );
+    Assert.isTrue(
+      SetupCheckInvocable.isSitePublished(
+        buildSite(SITE_LABEL, 'Active', 'Visualforce', 'unsubscribe'),
         new List<SObject>()
       ),
       'An active non-Experience site should pass'
@@ -234,22 +271,22 @@ private class SetupCheckInvocableTest {
   static void inactiveOrUnpublishedSiteFails() {
     Assert.isFalse(
       SetupCheckInvocable.isSitePublished(
-        buildSite('Inactive', 'ChatterNetwork', 'Unsubscribe'),
-        buildNetworks('Live', 'Unsubscribe')
+        buildSite(SITE_LABEL, 'Inactive', 'ChatterNetwork', SITE_PATH),
+        buildNetworks(SITE_LABEL, 'Live', SITE_PATH)
       ),
       'Inactive site should fail'
     );
     Assert.isFalse(
       SetupCheckInvocable.isSitePublished(
-        buildSite('Active', 'ChatterNetwork', 'Unsubscribe'),
-        buildNetworks('UnderConstruction', 'Unsubscribe')
+        buildSite(SITE_LABEL, 'Active', 'ChatterNetwork', SITE_PATH),
+        buildNetworks(SITE_LABEL, 'UnderConstruction', SITE_PATH)
       ),
       'Site whose network is not live should fail'
     );
     Assert.isFalse(
       SetupCheckInvocable.isSitePublished(
-        buildSite('Active', 'ChatterNetwork', 'Unsubscribe'),
-        buildNetworks('Live', 'Other')
+        buildSite(SITE_LABEL, 'Active', 'ChatterNetwork', SITE_PATH),
+        buildNetworks('Other', 'Live', 'other')
       ),
       'Site with no matching network should fail'
     );

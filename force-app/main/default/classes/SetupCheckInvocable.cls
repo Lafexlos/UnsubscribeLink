@@ -7,9 +7,13 @@ public without sharing class SetupCheckInvocable {
   private static final String SITE_STATUS_ACTIVE = 'Active';
   private static final String NETWORK_STATUS_LIVE = 'Live';
   private static final String NETWORK_SITE_TYPE_PREFIX = 'ChatterNetwork';
-  private static final String NETWORK_PATH_SUFFIX = '/s';
+  // Experience site paths can carry a '/s' or 'vforcesite' suffix that the Network path lacks.
+  private static final List<String> SITE_PATH_SUFFIXES = new List<String>{
+    '/s',
+    'vforcesite'
+  };
   // Dynamic query so the class still compiles in orgs without Experience Cloud.
-  private static final String NETWORK_QUERY = 'SELECT Id, Status, UrlPathPrefix FROM Network';
+  private static final String NETWORK_QUERY = 'SELECT Id, Name, Status, UrlPathPrefix FROM Network';
 
   @InvocableMethod(
     label='Run Unsubscribe Link Setup Check'
@@ -36,7 +40,7 @@ public without sharing class SetupCheckInvocable {
 
     Map<Id, Site> sitesById = new Map<Id, Site>(
       [
-        SELECT Id, Status, SiteType, UrlPathPrefix
+        SELECT Id, MasterLabel, Status, SiteType, UrlPathPrefix
         FROM Site
         WHERE Id IN :siteIds
       ]
@@ -44,7 +48,9 @@ public without sharing class SetupCheckInvocable {
     List<SObject> networks = siteIds.isEmpty()
       ? new List<SObject>()
       : queryNetworks();
-    Set<String> verifiedAddresses = getVerifiedAddresses(addresses);
+    Set<String> verifiedAddresses = collectVerifiedAddresses(
+      queryOrgWideAddresses(addresses)
+    );
 
     // COUNT() uses one query row, so this works for orgs of any size.
     Integer contactsMissing = [
@@ -59,20 +65,32 @@ public without sharing class SetupCheckInvocable {
     ];
 
     for (SetupCheckRequest request : requests) {
-      SetupCheckResult result = new SetupCheckResult();
-      result.siteIsPublished = isSitePublished(
-        sitesById.get(request.siteId),
-        networks
+      results.add(
+        buildResult(
+          isSitePublished(sitesById.get(request.siteId), networks),
+          isAddressVerified(request.orgWideEmailAddress, verifiedAddresses),
+          contactsMissing,
+          leadsMissing
+        )
       );
-      result.orgWideEmailIsVerified =
-        String.isNotBlank(request.orgWideEmailAddress) &&
-        verifiedAddresses.contains(request.orgWideEmailAddress.toLowerCase());
-      result.contactsMissingPublicId = contactsMissing;
-      result.leadsMissingPublicId = leadsMissing;
-      result.allPublicIdsSet = isEveryPublicIdSet(contactsMissing, leadsMissing);
-      results.add(result);
     }
     return results;
+  }
+
+  @TestVisible
+  private static SetupCheckResult buildResult(
+    Boolean siteIsPublished,
+    Boolean orgWideEmailIsVerified,
+    Integer contactsMissing,
+    Integer leadsMissing
+  ) {
+    SetupCheckResult result = new SetupCheckResult();
+    result.siteIsPublished = siteIsPublished;
+    result.orgWideEmailIsVerified = orgWideEmailIsVerified;
+    result.contactsMissingPublicId = contactsMissing;
+    result.leadsMissingPublicId = leadsMissing;
+    result.allPublicIdsSet = isEveryPublicIdSet(contactsMissing, leadsMissing);
+    return result;
   }
 
   @TestVisible
@@ -94,20 +112,41 @@ public without sharing class SetupCheckInvocable {
     ) {
       return true;
     }
+    SObject network = findNetwork(site, networks);
+    return network != null &&
+      (String) network.get('Status') == NETWORK_STATUS_LIVE;
+  }
+
+  // Network has no field that points to its Site, so match on the path first
+  // and fall back to the site label, which Salesforce sets to the Network name.
+  private static SObject findNetwork(Site site, List<SObject> networks) {
     String sitePath = normalizePath(site.UrlPathPrefix);
     for (SObject network : networks) {
       if (normalizePath((String) network.get('UrlPathPrefix')) == sitePath) {
-        return (String) network.get('Status') == NETWORK_STATUS_LIVE;
+        return network;
       }
     }
-    return false;
+    for (SObject network : networks) {
+      String networkName = (String) network.get('Name');
+      if (
+        String.isNotBlank(networkName) &&
+        networkName.equalsIgnoreCase(site.MasterLabel)
+      ) {
+        return network;
+      }
+    }
+    return null;
   }
 
   private static String normalizePath(String path) {
     if (String.isBlank(path)) {
       return '';
     }
-    return path.removeEnd(NETWORK_PATH_SUFFIX);
+    String normalized = path.toLowerCase();
+    for (String suffix : SITE_PATH_SUFFIXES) {
+      normalized = normalized.removeEnd(suffix);
+    }
+    return normalized;
   }
 
   private static List<SObject> queryNetworks() {
@@ -117,19 +156,39 @@ public without sharing class SetupCheckInvocable {
     return Database.query(NETWORK_QUERY);
   }
 
-  private static Set<String> getVerifiedAddresses(Set<String> addresses) {
-    Set<String> verified = new Set<String>();
+  private static List<OrgWideEmailAddress> queryOrgWideAddresses(
+    Set<String> addresses
+  ) {
     if (addresses.isEmpty()) {
-      return verified;
+      return new List<OrgWideEmailAddress>();
     }
-    for (OrgWideEmailAddress owa : [
-      SELECT Address
+    return [
+      SELECT Address, IsVerified
       FROM OrgWideEmailAddress
-      WHERE Address IN :addresses AND IsVerified = TRUE
-    ]) {
-      verified.add(owa.Address.toLowerCase());
+      WHERE Address IN :addresses
+    ];
+  }
+
+  @TestVisible
+  private static Set<String> collectVerifiedAddresses(
+    List<OrgWideEmailAddress> records
+  ) {
+    Set<String> verified = new Set<String>();
+    for (OrgWideEmailAddress owa : records) {
+      if (owa.IsVerified && String.isNotBlank(owa.Address)) {
+        verified.add(owa.Address.toLowerCase());
+      }
     }
     return verified;
+  }
+
+  @TestVisible
+  private static Boolean isAddressVerified(
+    String address,
+    Set<String> verifiedAddresses
+  ) {
+    return String.isNotBlank(address) &&
+      verifiedAddresses.contains(address.toLowerCase());
   }
 
   public class SetupCheckRequest {
