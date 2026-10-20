@@ -48,3 +48,13 @@ Smaller, independent items are listed first.
 - **Move settings to custom metadata.** If this happens, the batch interval and the retention period move along with the other settings.
 - **Warn about active Email Alerts.** Tell the Admin about Email Alerts or flows that send to Contacts or Leads, because those ignore Email Opt Out.
 - **Preference center.** Let Recipients unsubscribe per topic. Out of scope until global Unsubscribe works well.
+
+## Open decisions before ADR 0002 work
+
+1. A click on a link whose record was merged or deleted fails the existence check, so no Request is created and the Admin never hears about it. Accept that, or still create a Not Found Request?
+2. The unmanaged predecessor app built links with `varRecId=<CASESAFEID(Id)>`. Do those raw record Id links have to keep working under ADR 0001? Today they fall through to type-in mode.
+3. Type-in mode: should the Pending Key dedupe by email address, and is a typed address that matches nothing Not Found?
+4. Retries: should an Error retry forever or stop after N attempts?
+5. Guest run mode: keep `SystemModeWithoutSharing` with no object permissions for the guest (recommended), or user mode with create-only access?
+6. The confirm screen text that Admins wrote mentions the email address, which the guest page will no longer show.
+7. Found while planning: the current guest flow shows the email address on its confirm screen and marks `Email`, `FoundId` and `varRecId` as output variables, so they reach the browser.
