@@ -40,7 +40,6 @@ Smaller, independent items are listed first.
 ## Next sprint or known issues
 
 - **Pick the right site in the setup flow.** `Get_Experience_Site` takes the first Site with no filter, so an org with several sites can get the wrong one.
-- **Enable Translation Workbench in the scratch org definition.** Scratch orgs reject `nl_NL.translation-meta.xml` with "Not available for deploy for this organization", so the Dutch labels have never been deployed.
 - **Retire the Set Public Id flows in subscriber orgs.** Orgs that activated `Contact_After_Create_Update_Set_Public_Id` or `Lead_After_Create_Update_Set_Public_Id` must deactivate them after upgrading, because they ignore the import bypass. The setup flow's screen text that mentions these flows is out of date.
 - **Build the link from the Public Id instead of storing it.** Compute the URL in a formula from the Public Id plus the site URL kept in custom metadata. This removes the `+` split hack and the domain string replacement. It means migrating off `Part1_Unsubscribe_Link__c`. Links already sent are unaffected ([ADR 0001](adr/0001-unsubscribe-links-never-expire.md)).
 - **Keep links working after a merge.** Copy the losing record's Public Id onto the record that survives. Until then, those links end as Not Found Requests.
