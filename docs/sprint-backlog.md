@@ -44,4 +44,5 @@ Smaller, independent items are listed first.
 - **Confirm type-in Requests by email.** A type-in Request stays Pending until someone clicks a link sent to the typed address.
 - **Move settings to custom metadata.** If this happens, the batch interval and the retention period move along with the other settings.
 - **Warn about active Email Alerts.** Tell the Admin about Email Alerts or flows that send to Contacts or Leads, because those ignore Email Opt Out.
+- **Rename the unsubscribe page.** Give the flexipage `Unsubscribe_Link_4_0_020324_Unsubscribe` a shorter API name, and drop the old one from the package.
 - **Preference center.** Let Recipients unsubscribe per topic. Out of scope until global Unsubscribe works well.
