@@ -168,6 +168,13 @@
                 <elementReference>Email</elementReference>
             </value>
         </filters>
+        <filters>
+            <field>HasOptedOutOfEmail</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </filters>
         <object>Contact</object>
         <outputReference>contactCollection</outputReference>
         <queriedFields>Id</queriedFields>
