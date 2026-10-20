@@ -270,7 +270,7 @@ This screen will appear if a matching record is not found in the database.</desc
         <dataType>String</dataType>
         <isCollection>false</isCollection>
         <isInput>false</isInput>
-        <isOutput>true</isOutput>
+        <isOutput>false</isOutput>
     </variables>
     <variables>
         <description>userId incoming from the email link</description>
@@ -278,7 +278,7 @@ This screen will appear if a matching record is not found in the database.</desc
         <dataType>String</dataType>
         <isCollection>false</isCollection>
         <isInput>true</isInput>
-        <isOutput>true</isOutput>
+        <isOutput>false</isOutput>
     </variables>
     <variables>
         <name>Screen3</name>
