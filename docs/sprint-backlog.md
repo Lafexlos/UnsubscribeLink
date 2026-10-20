@@ -49,12 +49,14 @@ Smaller, independent items are listed first.
 - **Warn about active Email Alerts.** Tell the Admin about Email Alerts or flows that send to Contacts or Leads, because those ignore Email Opt Out.
 - **Preference center.** Let Recipients unsubscribe per topic. Out of scope until global Unsubscribe works well.
 
-## Open decisions before ADR 0002 work
+## Decisions for ADR 0002 work
 
-1. A click on a link whose record was merged or deleted fails the existence check, so no Request is created and the Admin never hears about it. Accept that, or still create a Not Found Request?
-2. The unmanaged predecessor app built links with `varRecId=<CASESAFEID(Id)>`. Do those raw record Id links have to keep working under ADR 0001? Today they fall through to type-in mode.
-3. Type-in mode: should the Pending Key dedupe by email address, and is a typed address that matches nothing Not Found?
-4. Retries: should an Error retry forever or stop after N attempts?
-5. Guest run mode: keep `SystemModeWithoutSharing` with no object permissions for the guest (recommended), or user mode with create-only access?
-6. The confirm screen text that Admins wrote mentions the email address, which the guest page will no longer show.
-7. Found while planning: the current guest flow shows the email address on its confirm screen and marks `Email`, `FoundId` and `varRecId` as output variables, so they reach the browser.
+1. Merged or deleted records: open, see below.
+2. Links from the unmanaged predecessor (`varRecId=<CASESAFEID(Id)>`) keep working, with no setting to turn them off. The existence check accepts 15- and 18-character Contact and Lead Ids.
+3. Type-in Requests dedupe by address through the Pending Key (`E:` plus the lower-case address). A typed address that matches nothing ends as Not Found.
+4. Error Requests retry up to `Max_Retry_Attempts__c` on the setup object, 5 by default. After that they stay Error and their Pending Key is cleared.
+5. The guest flow stays in system mode, and the guest profile gets no object permissions.
+6. Admin screen texts stay as they are, and the release notes ask Admins to check them.
+7. The email address and output variables in the guest flow get their own fix on `fix/quick-flow-inputs`, ahead of ADR 0002.
+
+Still open: a click on a link whose record was merged or deleted fails the existence check, so no Request is created. The proposal is that the check also looks at deleted records (`ALL ROWS`), and the batch follows `MasterRecordId` to the record that survived the merge.
