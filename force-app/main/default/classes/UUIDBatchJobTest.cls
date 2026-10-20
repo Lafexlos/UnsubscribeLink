@@ -2,6 +2,8 @@
 private class UUIDBatchJobTest {
   @TestSetup
   static void setupTestData() {
+    // The batch backfills records the Public Id triggers skipped
+    TestDataFactory.disablePublicIdAssignment();
     // Arrange: Create test data for Contacts and Leads with null UUID fields
     List<Contact> contacts = new List<Contact>();
     List<Lead> leads = new List<Lead>();
@@ -214,5 +216,43 @@ private class UUIDBatchJobTest {
         'Unsubscribe link should not be null after batch execution.'
       );
     }
+  }
+  @isTest
+  static void testBatchAddsLinkToRecordWithPublicIdButNoLink() {
+    // Arrange: a Contact saved before setup ran has a Public Id but no link
+    String existingPublicId = UUIDUtility.generateUUID();
+    Contact contact = new Contact(
+      LastName = 'Saved Before Setup',
+      Public_Id__c = existingPublicId
+    );
+    insert contact;
+    UUIDBatchJob batchJob = new UUIDBatchJob(
+      'Contact',
+      'Public_Id__c',
+      'Unsubscribe all'
+    );
+
+    // Act
+    Test.startTest();
+    Database.executeBatch(batchJob, 300);
+    Test.stopTest();
+
+    // Assert
+    Contact saved = [
+      SELECT Public_Id__c, Part1_Unsubscribe_Link__c
+      FROM Contact
+      WHERE Id = :contact.Id
+    ];
+    Assert.areEqual(
+      existingPublicId,
+      saved.Public_Id__c,
+      'The batch must keep an existing Public Id'
+    );
+    Assert.isTrue(
+      saved.Part1_Unsubscribe_Link__c.endsWith(
+        'unsubscribe?varRecId=C' + existingPublicId + '+Unsubscribe all'
+      ),
+      'The batch should build the link from the existing Public Id'
+    );
   }
 }

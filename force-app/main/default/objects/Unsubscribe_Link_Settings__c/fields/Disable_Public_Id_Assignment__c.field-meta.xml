@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Disable_Public_Id_Assignment__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>When checked, the Contact and Lead triggers do not set Public Id or Part1 Unsubscribe Link on new or updated records. Use it during large imports, for example only for the integration user. Records saved while it is checked get no Unsubscribe Link until you uncheck it and run the Unsubscribe Link Setup flow again, which starts the backfill batch.</description>
+    <inlineHelpText>Check to stop new Contacts and Leads from getting a Public Id and Unsubscribe Link, for example during a large import. Uncheck it afterwards and run the Unsubscribe Link Setup flow to fill in the missing links.</inlineHelpText>
+    <label>Disable Public Id Assignment</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>
