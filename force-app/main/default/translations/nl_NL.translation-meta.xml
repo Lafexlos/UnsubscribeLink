@@ -92,4 +92,8 @@
         <label>Open de lijstweergave Needs attention op het tabblad Unsubscribe om deze afmeldverzoeken te bekijken. Verzoeken zonder nieuwe pogingen en niet gevonden verzoeken worden niet opnieuw verwerkt, dus zet Email Opt Out waar nodig zelf aan.</label>
         <name>Request_Digest_Next_Steps</name>
     </customLabels>
+    <customLabels>
+        <label>E-mailadres</label>
+        <name>Type_In_Email_Address_Label</name>
+    </customLabels>
 </Translations>

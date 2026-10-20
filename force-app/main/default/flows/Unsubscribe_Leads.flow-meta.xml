@@ -107,7 +107,9 @@
             <label>Yes</label>
         </rules>
     </decisions>
-    <description>Part of the unmanaged package Unsubscribe Link and loops through all leads with a particular email address to mark them as email opt out. This flow is launched by the flow Unsubscribe Link Quick. This version of the flow uses RichText Email.
+    <description>DEPRECATED: Unsubscribe Link Quick no longer calls this flow. The Unsubscribe Request batch now opts out leads (ADR 0002). Kept so existing installs keep working. Don&apos;t use it in new automation, and remove the site guest user&apos;s access to it.
+
+Part of the unmanaged package Unsubscribe Link and loops through all leads with a particular email address to mark them as email opt out. This flow is launched by the flow Unsubscribe Link Quick. This version of the flow uses RichText Email.
 
 10/9/26: Removed hard-coded email address in Send Emmail Action and passed from parent.</description>
     <environments>Default</environments>

@@ -184,4 +184,12 @@
         <shortDescription>Last part of the Unsubscribe Request digest</shortDescription>
         <value>Open the Needs attention list view on the Unsubscribe tab to see these Unsubscribe Requests. Requests with no retries left and Not Found Requests are not processed again, so set Email Opt Out by hand where needed.</value>
     </labels>
+    <labels>
+        <fullName>Type_In_Email_Address_Label</fullName>
+        <categories>Unsubscribe page</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Label of the email field on the type-in screen</shortDescription>
+        <value>Email address</value>
+    </labels>
 </CustomLabels>
