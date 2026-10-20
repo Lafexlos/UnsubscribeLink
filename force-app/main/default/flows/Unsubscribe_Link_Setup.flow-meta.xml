@@ -40,7 +40,7 @@
         <actionName>UUIDBatchInvocable</actionName>
         <actionType>apex</actionType>
         <connector>
-            <targetReference>completeScreen</targetReference>
+            <targetReference>Run_Setup_Check</targetReference>
         </connector>
         <flowTransactionModel>Automatic</flowTransactionModel>
         <inputParameters>
@@ -63,6 +63,34 @@
         </inputParameters>
         <nameSegment>UUIDBatchInvocable</nameSegment>
         <offset>0</offset>
+    </actionCalls>
+    <actionCalls>
+        <description>Checks the site, the org-wide email address and the Public Ids for the setup check screen.</description>
+        <name>Run_Setup_Check</name>
+        <label>Run Setup Check</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <actionName>SetupCheckInvocable</actionName>
+        <actionType>apex</actionType>
+        <connector>
+            <targetReference>Setup_Check_Screen</targetReference>
+        </connector>
+        <flowTransactionModel>Automatic</flowTransactionModel>
+        <inputParameters>
+            <name>orgWideEmailAddress</name>
+            <value>
+                <elementReference>var_FinalRecord.Org_Wide_Email_Address__c</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>siteId</name>
+            <value>
+                <elementReference>Get_Experience_Site.Id</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>SetupCheckInvocable</nameSegment>
+        <offset>0</offset>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
     </actionCalls>
     <apiVersion>68.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
@@ -1716,6 +1744,29 @@ Added path Progress Indicator.</description>
             </styleProperties>
         </fields>
         <fields>
+            <name>TypeInModeWarning</name>
+            <fieldText>&lt;p&gt;&lt;strong style=&quot;color: rgb(186, 5, 23);&quot;&gt;{!$Label.Type_In_Mode_Warning}&lt;/strong&gt;&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+            <visibilityRule>
+                <conditionLogic>and</conditionLogic>
+                <conditions>
+                    <leftValueReference>type_in_unsubscribe</leftValueReference>
+                    <operator>EqualTo</operator>
+                    <rightValue>
+                        <stringValue>Yes</stringValue>
+                    </rightValue>
+                </conditions>
+            </visibilityRule>
+        </fields>
+        <fields>
             <name>Error_Email_Display_Text</name>
             <fieldText>&lt;p&gt;{!horizontalLine1}&lt;/p&gt;&lt;p&gt;&lt;strong style=&quot;font-size: 16px;&quot;&gt;Error Emails&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;The Flows that update records when Contacts or Leads unsubscribe send an email if there is an error. Specify the email these alerts will be sent to.&lt;/p&gt;</fieldText>
             <fieldType>DisplayText</fieldType>
@@ -1767,6 +1818,189 @@ Added path Progress Indicator.</description>
         <showHeader>false</showHeader>
         <stageReference>
             <elementReference>Initial_Configuration</elementReference>
+        </stageReference>
+    </screens>
+    <screens>
+        <description>Shows pass or fail for each setup check, with a fix hint when a check fails.</description>
+        <name>Setup_Check_Screen</name>
+        <label>Setup Check</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <allowBack>false</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <connector>
+            <targetReference>completeScreen</targetReference>
+        </connector>
+        <fields>
+            <name>SetupCheckHeader</name>
+            <fieldText>&lt;p&gt;&lt;strong style=&quot;font-size: 16px;&quot;&gt;{!$Label.Setup_Check_Title}&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;{!$Label.Setup_Check_Intro}&lt;/p&gt;&lt;p&gt;{!horizontalLine1}&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+        </fields>
+        <fields>
+            <name>SetupCheckSitePass</name>
+            <fieldText>&lt;p&gt;&lt;strong&gt;{!$Label.Setup_Check_Site_Pass}&lt;/strong&gt;&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+            <visibilityRule>
+                <conditionLogic>and</conditionLogic>
+                <conditions>
+                    <leftValueReference>Run_Setup_Check.siteIsPublished</leftValueReference>
+                    <operator>EqualTo</operator>
+                    <rightValue>
+                        <booleanValue>true</booleanValue>
+                    </rightValue>
+                </conditions>
+            </visibilityRule>
+        </fields>
+        <fields>
+            <name>SetupCheckSiteFail</name>
+            <fieldText>&lt;p&gt;&lt;strong&gt;{!$Label.Setup_Check_Site_Fail}&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;{!$Label.Setup_Check_Site_Hint}&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+            <visibilityRule>
+                <conditionLogic>and</conditionLogic>
+                <conditions>
+                    <leftValueReference>Run_Setup_Check.siteIsPublished</leftValueReference>
+                    <operator>EqualTo</operator>
+                    <rightValue>
+                        <booleanValue>false</booleanValue>
+                    </rightValue>
+                </conditions>
+            </visibilityRule>
+        </fields>
+        <fields>
+            <name>SetupCheckEmailPass</name>
+            <fieldText>&lt;p&gt;&lt;strong&gt;{!$Label.Setup_Check_Email_Pass}&lt;/strong&gt;&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+            <visibilityRule>
+                <conditionLogic>and</conditionLogic>
+                <conditions>
+                    <leftValueReference>var_FinalRecord.Send_Confirmation_Email__c</leftValueReference>
+                    <operator>EqualTo</operator>
+                    <rightValue>
+                        <stringValue>Yes</stringValue>
+                    </rightValue>
+                </conditions>
+                <conditions>
+                    <leftValueReference>Run_Setup_Check.orgWideEmailIsVerified</leftValueReference>
+                    <operator>EqualTo</operator>
+                    <rightValue>
+                        <booleanValue>true</booleanValue>
+                    </rightValue>
+                </conditions>
+            </visibilityRule>
+        </fields>
+        <fields>
+            <name>SetupCheckEmailFail</name>
+            <fieldText>&lt;p&gt;&lt;strong&gt;{!$Label.Setup_Check_Email_Fail}&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;{!$Label.Setup_Check_Email_Hint}&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+            <visibilityRule>
+                <conditionLogic>and</conditionLogic>
+                <conditions>
+                    <leftValueReference>var_FinalRecord.Send_Confirmation_Email__c</leftValueReference>
+                    <operator>EqualTo</operator>
+                    <rightValue>
+                        <stringValue>Yes</stringValue>
+                    </rightValue>
+                </conditions>
+                <conditions>
+                    <leftValueReference>Run_Setup_Check.orgWideEmailIsVerified</leftValueReference>
+                    <operator>EqualTo</operator>
+                    <rightValue>
+                        <booleanValue>false</booleanValue>
+                    </rightValue>
+                </conditions>
+            </visibilityRule>
+        </fields>
+        <fields>
+            <name>SetupCheckPublicIdPass</name>
+            <fieldText>&lt;p&gt;&lt;strong&gt;{!$Label.Setup_Check_Public_Id_Pass}&lt;/strong&gt;&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+            <visibilityRule>
+                <conditionLogic>and</conditionLogic>
+                <conditions>
+                    <leftValueReference>Run_Setup_Check.allPublicIdsSet</leftValueReference>
+                    <operator>EqualTo</operator>
+                    <rightValue>
+                        <booleanValue>true</booleanValue>
+                    </rightValue>
+                </conditions>
+            </visibilityRule>
+        </fields>
+        <fields>
+            <name>SetupCheckPublicIdFail</name>
+            <fieldText>&lt;p&gt;&lt;strong&gt;{!$Label.Setup_Check_Public_Id_Fail}&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;{!$Label.Setup_Check_Contacts_Missing}: {!Run_Setup_Check.contactsMissingPublicId}&lt;/p&gt;&lt;p&gt;{!$Label.Setup_Check_Leads_Missing}: {!Run_Setup_Check.leadsMissingPublicId}&lt;/p&gt;&lt;p&gt;{!$Label.Setup_Check_Public_Id_Hint}&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+            <visibilityRule>
+                <conditionLogic>and</conditionLogic>
+                <conditions>
+                    <leftValueReference>Run_Setup_Check.allPublicIdsSet</leftValueReference>
+                    <operator>EqualTo</operator>
+                    <rightValue>
+                        <booleanValue>false</booleanValue>
+                    </rightValue>
+                </conditions>
+            </visibilityRule>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>false</showHeader>
+        <stageReference>
+            <elementReference>Complete</elementReference>
         </stageReference>
     </screens>
     <screens>

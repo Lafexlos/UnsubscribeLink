@@ -21,11 +21,11 @@ Smaller, independent items are listed first.
 - [ ] **Test whether the Flow Send Email action honors Email Opt Out.** Run it in a scratch org and fill in that row of the README table.
 - [ ] **Assign Public Ids in an Apex before-insert trigger.** It replaces the Draft after-save flows `Contact_After_Create_Update_Set_Public_Id` and `Lead_After_Create_Update_Set_Public_Id`. Add a bypass switch for large imports. The existing backfill batch stays for records created before the trigger. Doing this drops the agenda item "friendly way to turn record-triggered flows on/off".
 - [ ] **Add a setup check to the setup flow.** It reports pass or fail for each of these:
-  - The site exists and is published.
-  - The org-wide email address is verified.
-  - The scheduled batch exists, and the user who scheduled it is active.
-  - Every Contact and Lead with an email address has a Public Id.
-- [ ] **Warn about type-in mode in the setup flow.** When the Admin turns type-in mode on, the setup flow says plainly that a script can unsubscribe any list of email addresses.
+  - [x] The site exists and is published.
+  - [x] The org-wide email address is verified.
+  - [ ] The scheduled batch exists, and the user who scheduled it is active. TODO: pending [ADR 0002](adr/0002-guest-only-records-requests.md), because the batch doesn't exist yet. Add this check to `SetupCheckInvocable` and `Setup_Check_Screen` when the batch is built.
+  - [x] Every Contact and Lead with an email address has a Public Id.
+- [x] **Warn about type-in mode in the setup flow.** When the Admin turns type-in mode on, the setup flow says plainly that a script can unsubscribe any list of email addresses.
 - [ ] **Make the guest only record a Request** ([ADR 0002](adr/0002-guest-only-records-requests.md)). This is the largest item and may need splitting.
   - Add the Pending and Not Found statuses to `Unsubscribe__c.Status__c`.
   - Remove the guest flows' `SystemModeWithoutSharing` writes to Contacts and Leads.
