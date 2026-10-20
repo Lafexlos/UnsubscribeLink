@@ -31,5 +31,6 @@ The page is public, so nothing here prevents abuse outright. These limits make a
 - The interval is a setup setting with a default of one hour. Changing it only takes effect when the setup flow reschedules the job.
 - An Error Request is retried up to a limit set on the setup object, 5 by default. After the last attempt it stays Error, its Pending Key is cleared so a new click can create a fresh Request, and the digest reports it once.
 - A typed address that matches no Contact or Lead ends as Not Found. The batch decides this, never the guest, so the page can't be used to test which addresses the org has.
+- A link whose record was merged or deleted before the click fails the existence check, so no Request is created, and the Admin is not told. We accept this gap.
 - A record can be deleted or merged after the existence check passes. If the batch then finds no match, the Request ends as Not Found and is never retried.
 - Type-in mode bypasses the existence check, because an email address is not a Public Id. A script with a list of addresses can therefore unsubscribe real Recipients. Until type-in Requests wait for confirmation through an email to the typed address, the setup flow must warn about this when the Admin turns type-in mode on.

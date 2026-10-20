@@ -51,12 +51,11 @@ Smaller, independent items are listed first.
 
 ## Decisions for ADR 0002 work
 
-1. Merged or deleted records: open, see below.
-2. Links from the unmanaged predecessor (`varRecId=<CASESAFEID(Id)>`) keep working, with no setting to turn them off. The existence check accepts 15- and 18-character Contact and Lead Ids.
+1. A click on a link whose record was merged or deleted creates no Request. We accept the gap.
+2. Links from the unmanaged predecessor (`varRecId=<CASESAFEID(Id)>`) work only when the Admin turns on `Accept_Legacy_Record_Id_Links__c` on the setup object, which is off by default. With it on, the existence check also accepts 15- and 18-character Contact and Lead Ids. The setup flow explains why it is off.
 3. Type-in Requests dedupe by address through the Pending Key (`E:` plus the lower-case address). A typed address that matches nothing ends as Not Found.
 4. Error Requests retry up to `Max_Retry_Attempts__c` on the setup object, 5 by default. After that they stay Error and their Pending Key is cleared.
 5. The guest flow stays in system mode, and the guest profile gets no object permissions.
 6. Admin screen texts stay as they are, and the release notes ask Admins to check them.
 7. The email address and output variables in the guest flow get their own fix on `fix/quick-flow-inputs`, ahead of ADR 0002.
 
-Still open: a click on a link whose record was merged or deleted fails the existence check, so no Request is created. The proposal is that the check also looks at deleted records (`ALL ROWS`), and the batch follows `MasterRecordId` to the record that survived the merge.
